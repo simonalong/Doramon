@@ -16,7 +16,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * 单机化幂等性工具
@@ -33,7 +32,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Idempotency {
 
     private static Idempotency instance = new Idempotency();
-    private static final String LOG_PRE = "[Idempotency]";
     /**
      * 幂等性的数据缓存表，这里采用线程安全的有序的Map，通过expireTime和dataStr合并进行排序，从而得到按照时间排序的，删除和插入都比较方便
      */
