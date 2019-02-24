@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.simon</groupId>
+    <artifactId>Doramon</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0-SNAPSHOT</version>
+
+    <name>Doraemon</name>
+    <description>哆啦A梦项目：用于放置自己平常开发的各种小工具项目</description>
+
+    <properties>
+        <lombok.version>1.16.22</lombok.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+
+            <!--lombok的配置-->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <modules>
+        <module>Neo</module>
+        <module>Smaug</module>
+        <module>Tyrion</module>
+        <module>Kimi</module>
+        <module>Ocean</module>
+    </modules>
+</project>
