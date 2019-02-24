@@ -13,5 +13,17 @@
     <name>Tyrion</name>
     <description>高性能幂等工具：Tyrion取名自《权力的游戏》中的小恶魔</description>
 
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.simon.eog</groupId>
+            <artifactId>common</artifactId>
+        </dependency>
+    </dependencies>
 
 </project>
