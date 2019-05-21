@@ -45,5 +45,6 @@
         <module>Tyrion</module>
         <module>Kimi</module>
         <module>Ocean</module>
+        <module>simba</module>
     </modules>
 </project>

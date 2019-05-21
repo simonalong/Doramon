@@ -1,5 +1,6 @@
 package com.simon.tyrion;
 
+import com.alibaba.fastjson.JSON;
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -16,9 +17,10 @@ import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * 单机化幂等性工具
+ * 高性能单机幂等性判断工具
  * 功能
  * 1.数据判断是否存在或者失效：如果不存在或失效，则自动添加到内部缓存中
  * 2.数据过期失效被清理：在过期后会自动清理对应的缓存数据，不会造成数据浪费
@@ -29,9 +31,11 @@ import java.util.stream.Stream;
  * @author zhouzhenyong
  * @since 2019/2/21 下午7:36
  */
+@Slf4j
 public class Idempotency {
 
     private static Idempotency instance = new Idempotency();
+    private static final String LOG_PRE = "[Idempotency]";
     /**
      * 幂等性的数据缓存表，这里采用线程安全的有序的Map，通过expireTime和dataStr合并进行排序，从而得到按照时间排序的，删除和插入都比较方便
      */
@@ -69,13 +73,13 @@ public class Idempotency {
      */
     private Runnable clearExpireHook;
     /**
-     * 第三方处理回调：数据实体
+     * 第三方处理回调：数据获取
      * param1：为对象的唯一key
      * param2：对象的过期时间
      */
     private Function<String, Long> selectHook;
     /**
-     * 第三方处理回调：第三方数据池中的数据是否为空，用于后面删除时候判断是否需要去第三方数据池删除，如果已经为空则不需要调用第三方了
+     * 第三方处理回调：是否为空，第三方数据池中的数据是否为空，用于后面删除时候判断是否需要去第三方数据池删除，如果已经为空则不需要调用第三方了
      * return：是否为空
      */
     private Supplier<Boolean> isEmptyHook;
@@ -114,6 +118,7 @@ public class Idempotency {
             if(null != isEmptyHook){
                 // 如果第三方为空了，则关闭第三方标志，否则继续调用清理逻辑
                 if (isEmptyHook.get()){
+                    log.debug(LOG_PRE + "关闭第三方");
                     outFlag = false;
                 } else {
                     if(null != isEmptyHook && !isEmptyHook.get()){
@@ -130,6 +135,10 @@ public class Idempotency {
      * 判断当前是否含有对应的数据，不包含则将对应的数据插入到缓存中
      */
     public boolean contain(Object... object) {
+        // 如果为null，则不进行数据的校验
+        if (null == object){
+            return false;
+        }
         String key = buildKey(object);
         if (innerContain(key)) {
             return true;
@@ -144,47 +153,53 @@ public class Idempotency {
      *
      * @param num 数据时长
      */
-    public void setExpire(Integer num, TimeUnit timeUnit) {
+    public Idempotency setExpire(Integer num, TimeUnit timeUnit) {
         this.backExpireTimeMills = timeUnit.toMillis(num);
+        return this;
     }
 
     /**
      * 提供可修改的最大值，不过内存占用大小，需要自己计算
      */
-    public void setMaxDataSize(Integer size){
+    public Idempotency setMaxDataSize(Integer size){
         this.maxDataSize = size;
+        return this;
     }
 
     /**
      * 注册第三方存储的数据插入回调
      */
-    public void registerInsertHook(BiConsumer<String, Long> insertHook){
+    public Idempotency registerInsertHook(BiConsumer<String, Long> insertHook){
         this.outFlag = true;
         this.insertHook = insertHook;
+        return this;
     }
 
     /**
      * 注册第三方存储的数据删除回调，
      */
-    public void registerClearExpireHook(Runnable clearExpireHook){
+    public Idempotency registerClearExpireHook(Runnable clearExpireHook){
         this.outFlag = true;
         this.clearExpireHook = clearExpireHook;
+        return this;
     }
 
     /**
      * 注册第三方存储的数据选择回调
      */
-    public void registerSelectHook(Function<String, Long> selectHook){
+    public Idempotency registerSelectHook(Function<String, Long> selectHook){
         this.outFlag = true;
         this.selectHook = selectHook;
+        return this;
     }
 
     /**
      * 注册第三方存储的数据是否为空的回调
      */
-    public void registerIsEmptyHook(Supplier<Boolean> isEmptyHook){
+    public Idempotency registerIsEmptyHook(Supplier<Boolean> isEmptyHook){
         this.outFlag = true;
         this.isEmptyHook = isEmptyHook;
+        return this;
     }
 
     /**
@@ -237,7 +252,7 @@ public class Idempotency {
             .map(o-> sb
                 .append(o.getClass().getCanonicalName())
                 .append(":")
-                .append(o.toString())
+                .append(JSON.toJSONString(o))
                 .toString())
             .reduce((a,b)-> sb
                 .append(a)

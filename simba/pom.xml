@@ -9,9 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>Neo</artifactId>
-    <name>Neo</name>
-    <description>一键式生成整个前后端， Neo是来自黑客帝国主角名字，用于表示新世界的生成</description>
+    <artifactId>simba</artifactId>
+    <description>一键式生成前后端工具</description>
 
 
 </project>
