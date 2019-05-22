@@ -25,6 +25,7 @@
         <okhttp.version>3.14.0</okhttp.version>
         <fastjson.version>1.2.29</fastjson.version>
         <zookeeper.version>3.4.10</zookeeper.version>
+        <lucene.version>8.1.0</lucene.version>
     </properties>
 
     <dependencyManagement>
@@ -63,7 +64,7 @@
             <dependency>
                 <groupId>org.apache.lucene</groupId>
                 <artifactId>lucene-core</artifactId>
-                <version>4.0.0</version>
+                <version>${lucene.version}</version>
             </dependency>
 
             <!-- 序列化 -->
