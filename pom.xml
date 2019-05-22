@@ -22,7 +22,9 @@
         <lombok.version>1.16.22</lombok.version>
         <freemarker.version>2.3.28</freemarker.version>
         <neo.version>0.3.1-SNAPSHOT</neo.version>
-        <fastJson.version>1.2.29</fastJson.version>
+        <okhttp.version>3.14.0</okhttp.version>
+        <fastjson.version>1.2.29</fastjson.version>
+        <zookeeper.version>3.4.10</zookeeper.version>
     </properties>
 
     <dependencyManagement>
@@ -32,20 +34,63 @@
                 <artifactId>common</artifactId>
                 <version>1.0-SNAPSHOT</version>
             </dependency>
+            <!--模板引擎-->
             <dependency>
                 <groupId>org.freemarker</groupId>
                 <artifactId>freemarker</artifactId>
                 <version>${freemarker.version}</version>
             </dependency>
+            <!--orm框架-->
             <dependency>
                 <groupId>com.simon.cloud</groupId>
                 <artifactId>Neo</artifactId>
                 <version>${neo.version}</version>
             </dependency>
+            <!--网络框架依赖-->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <!--zookeeper-->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>${zookeeper.version}</version>
+            </dependency>
+
+            <!--计算对象大小的工具-->
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>4.0.0</version>
+            </dependency>
+
+            <!-- 序列化 -->
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>fastjson</artifactId>
-                <version>${fastJson.version}</version>
+                <version>${fastjson.version}</version>
+            </dependency>
+
+            <!--spock测试框架-->
+            <dependency>
+                <groupId>org.spockframework</groupId>
+                <artifactId>spock-core</artifactId>
+                <version>1.2-groovy-2.4</version>
+                <scope>test</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.7</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>24.0-jre</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
