@@ -1,0 +1,4 @@
+#spring
+spring:
+  profiles:
+    active: local

@@ -1,7 +1,6 @@
 package ${appPath}.service;
 
-import ${appPath}.dao.BaseDao;
-import ${appPath}.dao.${tablePathName}Dao;
+import com.simon.neo.Neo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +11,15 @@ import org.springframework.stereotype.Service;
 public class ${tablePathName}Service extends BaseService{
 
     @Autowired
-    private ${tablePathName}Dao ${tablePathNameLower}Dao;
+    private Neo shareShop;
 
     @Override
-    protected BaseDao getDao() {
-        return ${tablePathNameLower}Dao;
+    protected Neo getNeo() {
+        return shareShop;
+    }
+
+    @Override
+    protected String getTableName() {
+        return "${tableName}";
     }
 }

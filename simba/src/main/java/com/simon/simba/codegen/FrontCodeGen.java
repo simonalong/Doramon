@@ -1,8 +1,19 @@
 package com.simon.simba.codegen;
 
 import com.simon.neo.Neo;
+import com.simon.neo.NeoMap;
 import com.simon.neo.db.NeoColumn;
+import com.simon.simba.FileUtil;
+import com.simon.simba.FreeMarkerTemplateUtil;
+import com.simon.simba.ListUtils;
+import com.simon.simba.Maps;
+import com.simon.simba.Strings;
+import com.simon.simba.entity.EnumInfo;
+import com.simon.simba.entity.EnumMeta;
+import com.simon.simba.entity.FieldInfo;
 import com.simon.simba.entity.ShowFieldInfo;
+import com.simon.simba.entity.TableInfo;
+import com.simon.simba.entity.UpdateAddFieldInfo;
 import freemarker.template.TemplateException;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -202,11 +213,11 @@ public class FrontCodeGen {
     /**
      * 添加枚举类型和对应的值
      */
-    private void configEnumTypeField(Map<String, Object> dataMap, List<Column> columns){
+    private void configEnumTypeField(Map<String, Object> dataMap, List<NeoColumn> columns){
         List<EnumInfo> infoList = new ArrayList<>();
         if (null != columns && !columns.isEmpty()) {
-            columns.stream().filter(c->c.getType().equals(mysqlEnumType))
-                .forEach(c-> infoList.add(EnumInfo.of(c.getName(), getEnumValueList(c.getRemarks()))));
+            columns.stream().filter(c->c.getColumnTypeName().equals(mysqlEnumType))
+                .forEach(c-> infoList.add(EnumInfo.of(c.getColumnName(), getEnumValueList(c.getColumnMeta().getRemarks()))));
         }
         dataMap.put("enumFields", infoList);
     }
@@ -214,17 +225,17 @@ public class FrontCodeGen {
     /**
      * 根据时间字段表，将各个表中的时间字段在界面上进行转换
      */
-    private void configTimeField(List<Column> columns, String tableName){
+    private void configTimeField(List<NeoColumn> columns, String tableName){
         if(null != columns && !columns.isEmpty()){
             columns.forEach(c->{
-                if(mysqlTimeType.contains(c.getType())) {
+                if(mysqlTimeType.contains(c.getColumnTypeName())) {
                     tableTimeFieldMap.compute(tableName, (k, v) -> {
                         if (null == v) {
                             List<String> dataList = new ArrayList<>();
-                            dataList.add(c.getName());
+                            dataList.add(c.getColumnName());
                             return dataList;
                         } else {
-                            v.add(c.getName());
+                            v.add(c.getColumnName());
                             return v;
                         }
                     });
@@ -236,22 +247,22 @@ public class FrontCodeGen {
     /**
      * 设置表的属性名和名称的对应，如果没有设置，则用DB中的注释，如果注释也没有，则直接用name
      */
-    private void configFieldName(List<Column> columns, String tableName){
+    private void configFieldName(List<NeoColumn> columns, String tableName){
         if(null != tableName && !"".equals(tableName)){
             Map<String, String> fieldMap = tableFieldNameMap.get(tableName);
             if (null != fieldMap) {
                 if (null != columns && !columns.isEmpty()) {
                     columns.forEach(c -> {
-                        fieldMap.compute(c.getName(), (k, v) -> {
+                        fieldMap.compute(c.getColumnName(), (k, v) -> {
                             if (null == v) {
-                                String remarks = c.getRemarks();
+                                String remarks = c.getColumnMeta().getRemarks();
                                 if (null != remarks) {
-                                    if (c.getType().equals(mysqlEnumType)) {
+                                    if (c.getColumnTypeName().equals(mysqlEnumType)) {
                                         return getEnumDesc(remarks);
                                     }
                                     return remarks;
                                 }
-                                return c.getName();
+                                return c.getColumnName();
                             } else {
                                 return v;
                             }
@@ -265,13 +276,13 @@ public class FrontCodeGen {
     /**
      * 设置搜索字段
      */
-    private void configSearchField(Map<String, Object> dataMap, List<Column> columns, String tableName){
+    private void configSearchField(Map<String, Object> dataMap, List<NeoColumn> columns, String tableName){
         List<FieldInfo> searchFieldMapList = new ArrayList<>();
         Optional.ofNullable(searchFieldsMap).map(searchField -> {
             Optional.ofNullable(searchFieldsMap.get(tableName)).map(fields -> {
                 fields.forEach(f -> {
                     if (null != columns && !columns.isEmpty()) {
-                        if (columns.stream().anyMatch(c -> c.getName().equals(f))) {
+                        if (columns.stream().anyMatch(c -> c.getColumnName().equals(f))) {
                             FieldInfo info = FieldInfo.of(f, getFieldDesc(tableName, f));
 
                             // 时间戳设置
@@ -397,9 +408,9 @@ public class FrontCodeGen {
     /**
      * 判断字段是否为枚举类型
      */
-    private boolean fieldIsEnum(List<Column> columns, String field) {
+    private boolean fieldIsEnum(List<NeoColumn> columns, String field) {
         if (null != columns && !columns.isEmpty()) {
-            return columns.stream().anyMatch(c -> c.getName().equals(field) && c.getType().equals(mysqlEnumType));
+            return columns.stream().anyMatch(c -> c.getColumnName().equals(field) && c.getColumnTypeName().equals(mysqlEnumType));
         }
         return false;
     }
@@ -506,7 +517,7 @@ public class FrontCodeGen {
     /**
      * 设置表的每一行展开字段，排除表格的字段，排除不展示的字段，其他的字段都进行展示
      */
-    private void configExpandField(Map<String, Object> dataMap, List<Column> columns, String tableName){
+    private void configExpandField(Map<String, Object> dataMap, List<NeoColumn> columns, String tableName){
         List<FieldInfo> expandFieldList = new ArrayList<>();
         List<String> tableShowFieldList;
         List<String> excludeFieldList;
@@ -519,18 +530,18 @@ public class FrontCodeGen {
 
             if (null != columns && !columns.isEmpty()) {
                 columns.stream()
-                    .filter(c -> !tableShowFieldList.contains(c.getName()))
-                    .filter(c -> !excludeFieldList.contains(c.getName()))
+                    .filter(c -> !tableShowFieldList.contains(c.getColumnName()))
+                    .filter(c -> !excludeFieldList.contains(c.getColumnName()))
                     .forEach(c -> {
-                        FieldInfo fieldInfo = FieldInfo.of(c.getName(), getFieldDesc(tableName, c.getName()));
+                        FieldInfo fieldInfo = FieldInfo.of(c.getColumnName(), getFieldDesc(tableName, c.getColumnName()));
 
                         // 设置时间字段
-                        if (fieldIsTimeField(tableName, c.getName())){
+                        if (fieldIsTimeField(tableName, c.getColumnName())){
                             fieldInfo.setTimeFlag(1);
                         }
 
                         // 设置图片字段
-                        if (fieldIsPicField(tableName, c.getName())){
+                        if (fieldIsPicField(tableName, c.getColumnName())){
                             fieldInfo.setPicFlag(1);
                         }
                         expandFieldList.add(fieldInfo);
@@ -545,18 +556,18 @@ public class FrontCodeGen {
      * 添加弹窗的时候要显示的字段
      * 其中有些这么几个基本字段是不要在添加框中展示的
      */
-    private void configAddField(Map<String, Object> dataMap, List<Column> columns, String tableName){
+    private void configAddField(Map<String, Object> dataMap, List<NeoColumn> columns, String tableName){
         List<UpdateAddFieldInfo> showFieldInfos = Optional.ofNullable(columns).map(c->
             c.stream()
-                .filter(column->!column.getName().equals("id"))
-                .filter(column->!column.getName().equals("create_time"))
-                .filter(column->!column.getName().equals("update_time"))
+                .filter(column->!column.getColumnName().equals("id"))
+                .filter(column->!column.getColumnName().equals("create_time"))
+                .filter(column->!column.getColumnName().equals("update_time"))
                 .map(column-> {
-                    String fieldName = column.getName();
+                    String fieldName = column.getColumnName();
                     UpdateAddFieldInfo info = UpdateAddFieldInfo.of(fieldName, getFieldDesc(tableName, fieldName));
 
                     // 设置哪些字段是不必需要填写的
-                    if(fieldIsRequired(tableName, column.getName())){
+                    if(fieldIsRequired(tableName, column.getColumnName())){
                         info.setRequire(1);
                     }
 
@@ -566,7 +577,7 @@ public class FrontCodeGen {
                     }
 
                     // 设置枚举类型
-                    if (column.getType().equals(mysqlEnumType)){
+                    if (column.getColumnTypeName().equals(mysqlEnumType)){
                         info.getFieldInfo().setEnumFlag(1);
                     }
                     return info;
@@ -578,28 +589,28 @@ public class FrontCodeGen {
     /**
      * 设置哪些字段是可以更新的，首先过滤排除表，然后查看展示表
      */
-    private void configUpdateField(Map<String, Object> dataMap, List<Column> columns, String tableName) {
+    private void configUpdateField(Map<String, Object> dataMap, List<NeoColumn> columns, String tableName) {
         List<UpdateAddFieldInfo> fieldInfos = new ArrayList<>();
         if (null != columns && !columns.isEmpty()) {
             fieldInfos = columns.stream().map(c -> {
-                UpdateAddFieldInfo info = UpdateAddFieldInfo.of(c.getName(), getFieldDesc(tableName, c.getName())).setCanEdit(1);
+                UpdateAddFieldInfo info = UpdateAddFieldInfo.of(c.getColumnName(), getFieldDesc(tableName, c.getColumnName())).setCanEdit(1);
                 // 设置哪些是需要更新的
-                if(!fieldCanEdit(tableName, c.getName())){
+                if(!fieldCanEdit(tableName, c.getColumnName())){
                     info.setCanEdit(0);
                 }
 
                 // 设置哪些字段是不必需要填写的
-                if(fieldIsRequired(tableName, c.getName())){
+                if(fieldIsRequired(tableName, c.getColumnName())){
                     info.setRequire(1);
                 }
 
                 // 设置时间类型
-                if (fieldIsTimeField(tableName, c.getName())){
+                if (fieldIsTimeField(tableName, c.getColumnName())){
                     info.getFieldInfo().setTimeFlag(1);
                 }
 
                 // 设置枚举类型
-                if (c.getType().equals(mysqlEnumType)){
+                if (c.getColumnTypeName().equals(mysqlEnumType)){
                     info.getFieldInfo().setEnumFlag(1);
                 }
 
@@ -772,10 +783,9 @@ public class FrontCodeGen {
         dataMap.put("tableComponentInfos", tableNameMap.entrySet().stream()
             .map(e-> {
                 String tableNameAfterPre = excludePreFix(e.getKey());
-                return Maps.of()
-                    .add("tableName", getTablePathSplitLower(tableNameAfterPre))
-                    .add("tablePathName", getTablePathName(tableNameAfterPre))
-                    .build();
+                return NeoMap.of()
+                    .append("tableName", getTablePathSplitLower(tableNameAfterPre))
+                    .append("tablePathName", getTablePathName(tableNameAfterPre));
             }).collect(Collectors.toList()));
     }
 
@@ -832,95 +842,96 @@ public class FrontCodeGen {
         FrontCodeGen front = new FrontCodeGen();
 
         // 设置代码路径
-        front.setCodePath("/Users/zhouzhenyong/work/likekj/like-base-front");
+        front.setCodePath("/Users/zhouzhenyong/project/private/Doramon/simba-web");
 
         /**************************************** 后端配置（必填） ****************************************/
         // 设置要监听的后端端口号
         front.setBackendPort("8087");
-        // 设置跟后端交互的url，最后一定不要带/
+        // 设置跟后端交互的url，最后不要带/
         front.setBackendUrl("/top/admin/api/v1");
 
         /**************************************** DB配置（必填） ****************************************/
+        // 设置db应用名字，只是用于唯一识别该数据库
+        front.setAppName("king");
         // 设置数据库信息
-        front.setDbUrl("jdbc:mysql://118.31.38.50:3306/like?useUnicode=true&characterEncoding=UTF-8");
-        front.setAppName("like");
-        front.setDbUserName("like");
-        front.setDbUserPassword("Like@123");
+        front.setDbUrl("jdbc:mysql://127.0.0.1:3306/king?useUnicode=true&characterEncoding=UTF-8&useSSL=false");
+        front.setDbUserName("neo_test");
+        front.setDbUserPassword("neo@Test123");
 
         /**************************************** 要展示的表基本信息（必填） **********************/
         // 设置表前缀过滤
-        front.setPreFix("tp_");
+        front.setPreFix("t_");
         // 设置要输出的表
-        front.setIncludes("lk_talk", "lk_user");
+        front.setIncludes("t_task", "t_config_group");
         // 设置要排除的表
-//        front.setExcludes("lk_user");
+        // front.setExcludes("lk_user");
 
         // 表和表的中文名对应
         front.setTableNameMap(
             Maps.of()
-                .put("lk_talk", "说说")
-                .add("lk_user", "用户")
+                .put("t_task", "任务管理")
+                .add("t_config_group", "分组")
                 .build()
         );
 
         /***************************************** 表的属性信息（非必填） *********************************/
         // 设置表的属性和界面中文展示，主要用于中文关联，如果不设置，则默认用数据库的注释
-        front.setTableFieldNameMap(
-            Maps.of()
-                .add("lk_talk", Maps.of()
-                    .add("id", "id").add("title", "标题").add("status", "状态").add("address", "地址")
-                    .build())
-                .add("lk_user", Maps.of()
-                    .add("id", "id").add("name", "姓名").add("head_img", "头像")
-                    .build())
-                .build()
-        );
+//        front.setTableFieldNameMap(
+//            Maps.of()
+//                .add("lk_talk", Maps.of()
+//                    .add("id", "id").add("title", "标题").add("status", "状态").add("address", "地址")
+//                    .build())
+//                .add("lk_user", Maps.of()
+//                    .add("id", "id").add("name", "姓名").add("head_img", "头像")
+//                    .build())
+//                .build()
+//        );
 
         // 设置表中的某些字段界面显示为图片
-        front.setTablePicFieldMap(
-            Maps.of()
-                .add("lk_talk", Arrays.asList("head_img"))
-                .add("lk_user", Arrays.asList("head_img"))
-                .build()
-        );
+//        front.setTablePicFieldMap(
+//            Maps.of()
+//                .add("lk_talk", Arrays.asList("head_img"))
+//                .add("lk_user", Arrays.asList("head_img"))
+//                .build()
+//        );
 
         /********************************************* 界面属性（查看具体） **************************************************/
         // 不展示字段：一旦设置界面上就不会展示（可不填）
         front.setExcludesFieldsMap(
             Maps.of()
-                //.add("lk_talk", Arrays.asList("update_time"))
-                .add("lk_user", Arrays.asList("update_by"))
+                .add("t_task", Arrays.asList("create_user_name", "update_user_name"))
+                .add("t_config_group", Arrays.asList("create_user_name", "update_user_name"))
                 .build()
         );
 
         // 搜索字段：用于界面展示那些搜索框（必填）
         front.setSearchFieldsMap(
             Maps.of()
-                .add("tp_invite_relate", Arrays.asList("id", "invite_key", "create_time"))
-                .add("tp_marriage", Arrays.asList("id", "male_name", "female_name", "male_lunar_flag"))
+                .add("t_task", Arrays.asList("task_group", "task_name"))
+                .add("t_config_group", Arrays.asList("group_code"))
                 .build()
         );
 
-        // 表格展示字段：字段（必填）和占的大小（每个表最大可能85，大小可以不设置，默认20）
-        front.setTableShowFieldsMap(
-            Maps.of()
-                .add("tp_invite_relate", Arrays.asList(
-                    ShowFieldInfo.of("id"),
-                    ShowFieldInfo.of("invite_key"),
-                    ShowFieldInfo.of("create_time"),
-                    ShowFieldInfo.of("update_time")
-                ))
-                .add("tp_marriage", Arrays.asList(
-                    ShowFieldInfo.of("id"),
-                    ShowFieldInfo.of("user_id"),
-                    ShowFieldInfo.of("male_name").setRate(10),
-                    ShowFieldInfo.of("female_name").setRate(10),
-                    ShowFieldInfo.of("male_birthday").setRate(18),
-                    ShowFieldInfo.of("female_lunar_flag").setRate(18),
-                    ShowFieldInfo.of("create_time").setRate(18)
-                ))
-                .build()
-        );
+//        // 表格展示字段：字段（必填）和占的大小（每个表最大可能85，大小可以不设置，默认20）
+//        front.setTableShowFieldsMap(
+//            Maps.of()
+//                .add("tp_invite_relate", Arrays.asList(
+//                    ShowFieldInfo.of("id"),
+//                    ShowFieldInfo.of("invite_key"),
+//                    ShowFieldInfo.of("create_time"),
+//                    ShowFieldInfo.of("update_time")
+//                ))
+//                .add("tp_marriage", Arrays.asList(
+//                    ShowFieldInfo.of("id"),
+//                    ShowFieldInfo.of("user_id"),
+//                    ShowFieldInfo.of("male_name").setRate(10),
+//                    ShowFieldInfo.of("female_name").setRate(10),
+//                    ShowFieldInfo.of("male_birthday").setRate(18),
+//                    ShowFieldInfo.of("female_lunar_flag").setRate(18),
+//                    ShowFieldInfo.of("create_time").setRate(18)
+//                ))
+//                .build()
+//        );
 
         /***************** 更新属性字段（非必填） *******************/
         // 启用字段：跟下面属性相反，用于启用字段较少情况
@@ -931,21 +942,21 @@ public class FrontCodeGen {
 //                .build()
 //        );
 
-        // 禁用字段：用于更新的弹窗中属性的禁用，跟上面属性设置相反
-        front.setCantUpdateFieldsMap(
-            Maps.of()
-                .add("lk_talk", Arrays.asList("id", "create_by", "create_time", "update_time"))
-                .add("lk_user", Arrays.asList("id", "create_time", "update_time"))
-                .build()
-        );
-
-        // 字段是否必填：设置哪些字段是在增加和更新时候是必需的
-        front.setRequiredFieldsMap(
-            Maps.of()
-                .add("lk_talk", Arrays.asList("id"))
-                .add("lk_user", Arrays.asList("id"))
-                .build()
-        );
+//        // 禁用字段：用于更新的弹窗中属性的禁用，跟上面属性设置相反
+//        front.setCantUpdateFieldsMap(
+//            Maps.of()
+//                .add("lk_talk", Arrays.asList("id", "create_by", "create_time", "update_time"))
+//                .add("lk_user", Arrays.asList("id", "create_time", "update_time"))
+//                .build()
+//        );
+//
+//        // 字段是否必填：设置哪些字段是在增加和更新时候是必需的
+//        front.setRequiredFieldsMap(
+//            Maps.of()
+//                .add("lk_talk", Arrays.asList("id"))
+//                .add("lk_user", Arrays.asList("id"))
+//                .build()
+//        );
 
         // generate
         front.generate();

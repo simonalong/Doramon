@@ -2,9 +2,9 @@ package ${appPath}.controller;
 
 import ${appPath}.constants.AdminConstant;
 import ${appPath}.service.${tablePathName}Service;
+import com.simon.neo.NeoMap;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
-import me.zzp.am.Record;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -28,7 +28,7 @@ public class ${tablePathName}Controller extends BaseResponseController {
     private ${tablePathName}Service ${tablePathNameLower}Service;
 
     @PutMapping("add")
-    public ResponseEntity add(@RequestBody Record record, HttpServletRequest httpServletRequest) {
+    public ResponseEntity add(@RequestBody NeoMap record, HttpServletRequest httpServletRequest) {
         log.debug("增加：" + record);
         try {
             return ok(${tablePathNameLower}Service.insert(record));
@@ -50,7 +50,7 @@ public class ${tablePathName}Controller extends BaseResponseController {
     }
 
     @PostMapping("update")
-    public ResponseEntity update(@RequestBody Record record, HttpServletRequest httpServletRequest) {
+    public ResponseEntity update(@RequestBody NeoMap record, HttpServletRequest httpServletRequest) {
         log.debug("更新：" + record);
         try {
             return ok(${tablePathNameLower}Service.update(record));
@@ -61,13 +61,13 @@ public class ${tablePathName}Controller extends BaseResponseController {
     }
 
     @PostMapping("pageList")
-    public ResponseEntity<List> pageList(@RequestBody Record record, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<List> pageList(@RequestBody NeoMap record, HttpServletRequest httpServletRequest) {
         log.debug("查看分页数据：" + record);
         return ok(${tablePathNameLower}Service.getPage(record));
     }
 
     @PostMapping("count")
-    public ResponseEntity<Integer> count(@RequestBody Record record, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<Integer> count(@RequestBody NeoMap record, HttpServletRequest httpServletRequest) {
         log.debug("查看总个数：" + record);
         return ok(${tablePathNameLower}Service.count(record));
     }

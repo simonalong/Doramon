@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import lombok.Setter;
+import lombok.experimental.Accessors;
 
 /**
  * 后端控制台生成器
@@ -22,6 +23,7 @@ import lombok.Setter;
  * @since 2019/1/2 下午3:18
  */
 @Setter
+@Accessors(chain = true)
 public class BackendCodeGen {
     /**
      * 库名字
@@ -31,10 +33,6 @@ public class BackendCodeGen {
      * 应用名字
      */
     private String appName;
-    /**
-     * 全局id生成器所在的包路径，比如：com.qlchat.share.shop.common.IdGeneratorServer
-     */
-    private String idGenPath;
     /**
      * 应用的包路径
      */
@@ -56,12 +54,29 @@ public class BackendCodeGen {
      */
     private List<String> excludeTables = new ArrayList<>();
 
-    public void setIncludes(String ...tables){
+    public BackendCodeGen setIncludes(String ...tables){
         includeTables.addAll(Arrays.asList(tables));
+        return this;
     }
 
-    public void setExcludes(String ...tables){
+    public BackendCodeGen setExcludes(String ...tables){
         excludeTables.addAll(Arrays.asList(tables));
+        return this;
+    }
+
+    public BackendCodeGen setAppPath(String appPath){
+        this.appPath = appPath;
+        this.codePath += appPath.replace(".", "/") + "/";
+        return this;
+    }
+
+    public BackendCodeGen setCodePath(String codePath){
+        if(codePath.endsWith("/")){
+            this.codePath = codePath + "src/main/java/";
+        }else{
+            this.codePath = codePath + "/src/main/java/";
+        }
+        return this;
     }
 
     public void generate(){
@@ -79,7 +94,7 @@ public class BackendCodeGen {
                 // service
                 writeFile(dataMap, codePath + "/service/" + getTablePathName(tableNameAfterPre) + "Service.java", "service.ftl");
                 // dao
-                writeFile(dataMap, codePath + "/dao/" + getTablePathName(tableNameAfterPre) + "Dao.java", "dao.ftl");
+//                writeFile(dataMap, codePath + "/dao/" + getTablePathName(tableNameAfterPre) + "Dao.java", "dao.ftl");
             });
         }
 
@@ -94,7 +109,6 @@ public class BackendCodeGen {
         dataMap.put("dbName", dbName);
         dataMap.put("appName", appName);
         dataMap.put("appPath", appPath);
-        dataMap.put("idGenPath", idGenPath);
 
         // DbConfiguration
         writeFile(dataMap, codePath + "/config/DbConfiguration.java", "dbConfiguration.ftl");
@@ -109,16 +123,16 @@ public class BackendCodeGen {
 
         // AdminUserController
         writeFile(dataMap, codePath + "/controller/AdminUserController.java", "adminUserController.ftl");
-        // BaseDao
-        writeFile(dataMap, codePath + "/dao/BaseDao.java", "baseDao.ftl");
+//        // BaseDao
+//        writeFile(dataMap, codePath + "/dao/BaseDao.java", "baseDao.ftl");
 
         // BaseService
         writeFile(dataMap, codePath + "/service/BaseService.java", "baseService.ftl");
 
-        // TypeUtils
-        writeFile(dataMap, codePath + "/util/TypeUtils.java", "typeUtils.ftl");
-        // RecordUtils
-        writeFile(dataMap, codePath + "/util/RecordUtils.java", "recordUtils.ftl");
+//        // TypeUtils
+//        writeFile(dataMap, codePath + "/util/TypeUtils.java", "typeUtils.ftl");
+//        // RecordUtils
+//        writeFile(dataMap, codePath + "/util/RecordUtils.java", "recordUtils.ftl");
 
         // AccountEntity
         writeFile(dataMap, codePath + "/view/AccountEntity.java", "accountEntity.ftl");
@@ -174,28 +188,25 @@ public class BackendCodeGen {
     }
 
     public static void main(String ...args){
-        BackendCodeGen backend = new BackendCodeGen();
-
+        new BackendCodeGen()
         // 设置代码生成的路径
-        backend.setCodePath("/Users/zhouzhenyong/work/qlchat/qlchat-share-shop/share-shop-admin-back/src/main/java/com/qlchat/share/shop/admin/");
+        .setCodePath("/Users/zhouzhenyong/project/private/Doramon/integration")
 
         // 设置数据库的名字，只是用于数据的标记
-        backend.setDbName("shareShop");
+        .setDbName("king")
         // 设置应用名字，用于对外的url路径
-        backend.setAppName("share/shop");
+        .setAppName("simon/king")
         // 设置应用的打包路径
-        backend.setAppPath("com.qlchat.share.shop.admin");
-        // 设置全局id生成器的位置
-        backend.setIdGenPath("com.qlchat.share.shop.common.IdGeneratorServer");
+        .setAppPath("com.simon.doraemon")
 
         // 设置表前缀过滤
-        backend.setPreFix("ql_");
+        .setPreFix("t_")
         // 设置要输出的表
-        backend.setIncludes("ql_share_user_ref_log");
+        .setIncludes("t_config_group")
         // 设置要排除的表
-        //backend.setExcludes("lk_talk");
+        //.setExcludes("t_test");
 
         // 代码生成
-        backend.generate();
+        .generate();
     }
 }

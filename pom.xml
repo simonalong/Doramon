@@ -63,5 +63,6 @@
         <module>Kimi</module>
         <module>Ocean</module>
         <module>simba</module>
+        <module>integration</module>
     </modules>
 </project>

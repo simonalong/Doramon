@@ -3,10 +3,10 @@ package ${appPath}.controller;
 import ${appPath}.constants.AdminConstant;
 import ${appPath}.view.LoginResponseEntity;
 import ${appPath}.view.AccountEntity;
+import com.simon.neo.NeoMap;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
-import me.zzp.am.Record;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +24,7 @@ public class AdminUserController implements InitializingBean {
     private Map<String, AccountEntity> userMap = new HashMap<>();
 
     @PostMapping("login/account")
-    public LoginResponseEntity account(@RequestBody Record record) {
+    public LoginResponseEntity account(@RequestBody NeoMap record) {
         log.debug("用户登录account：" + record);
         AccountEntity account = userValid(record);
         if (null != account){
@@ -33,8 +33,8 @@ public class AdminUserController implements InitializingBean {
         return LoginResponseEntity.loginFail();
     }
 
-    private AccountEntity userValid(Record record){
-        if(!record.isEmpty()){
+    private AccountEntity userValid(NeoMap record){
+        if(!NeoMap.isEmpty(record)){
             String name = record.getStr("userName");
             if(userMap.containsKey(name)){
                 AccountEntity account = userMap.get(name);
