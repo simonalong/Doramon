@@ -18,7 +18,7 @@ public class IdCardParserDemo {
     @Test
     @SneakyThrows
     public void testParser(){
-        String idCard = "410928199102226311";
+        String idCard = "410928199612336433";
         // 获取单例对象
         IdCardParser helper = IdCardParser.getInstance();
         // 获取全国数据省市对应图
@@ -50,7 +50,7 @@ public class IdCardParserDemo {
     public void testObjectIdValid(){
         // 获取单例对象
         IdCardParser helper = IdCardParser.getInstance();
-        helper.setIdCard("410928199102226311");
+        helper.setIdCard("410928199612336433");
         show(helper.valid());
     }
 
@@ -62,7 +62,7 @@ public class IdCardParserDemo {
     public void testObjectIdAddress(){
         // 获取单例对象
         IdCardParser helper = IdCardParser.getInstance();
-        helper.setIdCard("410928199102226311");
+        helper.setIdCard("410928199612336433");
         show(helper.parseAddress());
     }
 
@@ -74,7 +74,7 @@ public class IdCardParserDemo {
     public void testObjectIdBirth(){
         // 获取单例对象
         IdCardParser helper = IdCardParser.getInstance();
-        helper.setIdCard("410928199102226311");
+        helper.setIdCard("410928199612336433");
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         show(format.format(helper.parseBirthday()));
@@ -87,7 +87,7 @@ public class IdCardParserDemo {
     @SneakyThrows
     public void testObjectIdGender(){
         // 获取单例对象
-        IdCardParser helper = IdCardParser.getInstance("410928199102226311");
+        IdCardParser helper = IdCardParser.getInstance("410928199612336433");
         show(helper.parseGender());
     }
 
@@ -98,7 +98,7 @@ public class IdCardParserDemo {
     @SneakyThrows
     public void testObjectIdConstellation(){
         // 获取单例对象
-        IdCardParser helper = IdCardParser.getInstance("410928199102226311");
+        IdCardParser helper = IdCardParser.getInstance("410928199612336433");
         show(helper.parseConstellation());
     }
 
@@ -109,7 +109,7 @@ public class IdCardParserDemo {
     @SneakyThrows
     public void testObjectIdAge(){
         // 获取单例对象
-        IdCardParser helper = IdCardParser.getInstance("410928199105226311");
+        IdCardParser helper = IdCardParser.getInstance("410928199612336433");
         show(helper.parseAge());
     }
 
@@ -182,7 +182,7 @@ public class IdCardParserDemo {
     @SneakyThrows
     public void testStaticIdConstellation(){
         // 获取单例对象
-        show(IdCardParser.parseConstellation("410928199102226311"));
+        show(IdCardParser.parseConstellation("410928199612336433"));
     }
 
     /**
@@ -192,6 +192,6 @@ public class IdCardParserDemo {
     @SneakyThrows
     public void testStaticIdAge(){
         // 获取单例对象
-        show(IdCardParser.parseAge("410928199105226311"));
+        show(IdCardParser.parseAge("410928199612336433"));
     }
 }
