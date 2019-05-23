@@ -1,6 +1,4 @@
-# 小工具（Ocean）
 
-<a name="IB0ic"></a>
 # Doraemon
 用于存放平常常用的一些工具：
 
