@@ -42,6 +42,7 @@ public class BitMap {
             synchronized (BitMap.class){
                 if(null == instance){
                     instance = new BitMap();
+                    instance.initMaxValue();
                 }
             }
         }
@@ -61,14 +62,6 @@ public class BitMap {
             dataSize = size / BITWORD + 1;
             flags = new int[dataSize];
         }
-    }
-
-    /**
-     * 设置数据的可以存储的默认的最大值，为2^32次方，如果采用int作为数组，则除以32，则为2^27个int，即128 * 2^20
-     */
-    public void initMaxValue(){
-        dataSize = 128 * M;
-        flags = new int[dataSize];
     }
 
     /**
@@ -112,6 +105,14 @@ public class BitMap {
             cnt += count(a);
         }
         return cnt;
+    }
+
+    /**
+     * 设置数据的可以存储的默认的最大值，为2^32次方，如果采用int作为数组，则除以32，则为2^27个int，即128 * 2^20，占内存512MB数据
+     */
+    private void initMaxValue(){
+        dataSize = 128 * M;
+        flags = new int[dataSize];
     }
 
     /**

@@ -25,7 +25,8 @@
         <okhttp.version>3.14.0</okhttp.version>
         <fastjson.version>1.2.29</fastjson.version>
         <zookeeper.version>3.4.10</zookeeper.version>
-        <lucene.version>8.1.0</lucene.version>
+        <lucene.version>4.0.0</lucene.version>
+        <guava.version>24.0-jre</guava.version>
     </properties>
 
     <dependencyManagement>
@@ -91,7 +92,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>24.0-jre</version>
+                <version>${guava.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -104,7 +105,6 @@
     </dependencies>
 
     <modules>
-        <module>Kimi</module>
         <module>Ocean</module>
         <module>simba</module>
         <module>integration</module>

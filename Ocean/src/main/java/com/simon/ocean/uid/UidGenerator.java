@@ -15,9 +15,9 @@ public final class UidGenerator {
 
     private Neo neo;
     /**
-     * 步长
+     * 步长，默认1万
      */
-    private Integer stepSize;
+    private Integer stepSize = 10 * 1000;
     /**
      * 全局id生成器的表名
      */
@@ -44,7 +44,7 @@ public final class UidGenerator {
     private UidGenerator(){}
 
     /**
-     * 全局id生成器的构造函数
+     * 全局id生成器的单例
      *
      * @param neo 数据库对象
      * @param stepSize 步长
@@ -56,7 +56,7 @@ public final class UidGenerator {
             throw new RefreshRatioException("参数：refreshRation不合法，为" + refreshRatio);
         }
         if (null == instance) {
-            synchronized (com.simon.neo.uid.UidGenerator.class) {
+            synchronized (UidGenerator.class) {
                 if (null == instance) {
                     instance = new UidGenerator();
                     instance.neo = neo;
@@ -68,11 +68,29 @@ public final class UidGenerator {
         return instance;
     }
 
+    /**
+     * 全局id生成器的单例，采用默认步长和刷新比例
+     * @param neo 数据库对象
+     * @return 全局id生成器对象
+     */
+    public static UidGenerator getInstance(Neo neo){
+        if (null == instance) {
+            synchronized (UidGenerator.class) {
+                if (null == instance) {
+                    instance = new UidGenerator();
+                    instance.neo = neo;
+                    instance.init(neo, instance.stepSize, 0.2f);
+                }
+            }
+        }
+        return instance;
+    }
+
     public Long getUid(){
         Long uid = uuidIndex.getAndIncrement();
         // 到达刷新buf的位置则进行刷新二级缓存
         if(rangeManager.readyRefresh(uid)){
-            synchronized (com.simon.neo.uid.UidGenerator.class){
+            synchronized (UidGenerator.class){
                 if(rangeManager.readyRefresh(uid)){
                     rangeManager.refreshRangeStart(allocStart());
                 }
@@ -123,7 +141,7 @@ public final class UidGenerator {
      */
     private void tableInitPreHandle() {
         if (!tableInitFlag) {
-            synchronized (com.simon.neo.uid.UidGenerator.class) {
+            synchronized (UidGenerator.class) {
                 if (!tableInitFlag) {
                     initTable();
                     tableInitFlag = true;

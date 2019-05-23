@@ -77,7 +77,7 @@ public class ZookeeperClient {
     }
 
     /**
-     * 创建zookeeper的客户端
+     * 链接
      */
     public ZookeeperClient connect(String connectString) {
         this.close();
@@ -121,7 +121,7 @@ public class ZookeeperClient {
     }
 
     /**
-     * 添加永久临时节点
+     * 添加永久有序节点
      * @param nodePath 父级节点路径
      * @return 新生成的节点路径
      */
@@ -139,7 +139,7 @@ public class ZookeeperClient {
     }
 
     /**
-     * 添加临时节点
+     * 添加临时有序节点
      * @param nodePath 节点路径
      * @return 新生成的节点路径
      */
@@ -346,6 +346,18 @@ public class ZookeeperClient {
     public void addWatchChildren(String path) {
         try {
             zk.getChildren(path, true);
+        } catch (KeeperException | InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 对指定路径添加监控
+     * @param path 路径
+     */
+    public void addWatch(String path){
+        try {
+            zk.getData(path, true, null);
         } catch (KeeperException | InterruptedException e) {
             e.printStackTrace();
         }
