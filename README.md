@@ -24,7 +24,7 @@
 simba和simba-web
 <a name="J1Zxs"></a>
 #### 技术：
-模板引擎：Freemarker<br />后端:<br />**- **Orm：[Neo框架](https://github.com/SimonAlong/Neo)<br />**- **框架：spring-boot 2.0.4<br />前端：ant-design-pro
+模板引擎：Freemarker<br />后端:<br />Orm：[Neo框架](https://github.com/SimonAlong/Neo)<br />框架：spring-boot 2.0.4<br />前端：ant-design-pro
 <a name="FfBcR"></a>
 #### 说明：
 该工具执行完成之后，可以直接生成一个具备这样功能的控制台，增删改查，分页查询，界面搜索字段可以配置（根据字段是普通的还是枚举还是时间，分别对应输入框、下拉框和时间范围选择框），此外，如果字段是图片，还可以配置成图片展示，如果是时间则按照时间展示。<br />该工具分为两个类，前端一个后端一个，生成时候分别配置响应的参数，启动即可生成响应的配置，前端尽量使用simba-web这个作为基础模块，后端只需要创建好完全的空项目即可生成可执行的，但是maven的pom中需要引入如下几个。前后端执行完之后，运行，即可具备增删改查分页等各种常见的功能
