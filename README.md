@@ -302,6 +302,7 @@ Ocean
 @Test
 @SneakyThrows
 public void testParser(){
+    // 身份证号是随机编写的
     String idCard = "410928199612336433";
     // 获取单例对象
     IdCardParser helper = IdCardParser.getInstance();
