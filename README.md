@@ -30,6 +30,7 @@ simba和simba-web
 <a name="FfBcR"></a>
 #### 说明：
 该工具执行完成之后，可以直接生成一个具备这样功能的控制台，增删改查，分页查询，界面搜索字段可以配置（根据字段是普通的还是枚举还是时间，分别对应输入框、下拉框和时间范围选择框），此外，如果字段是图片，还可以配置成图片展示，如果是时间则按照时间展示。<br />该工具分为两个类，前端一个后端一个，生成时候分别配置响应的参数，启动即可生成响应的配置，前端尽量使用simba-web这个作为基础模块，后端只需要创建好完全的空项目即可生成可执行的，但是maven的pom中需要引入如下几个。前后端执行完之后，运行，即可具备增删改查分页等各种常见的功能
+
 ```xml
 <dependency>
   <groupId>org.springframework.boot</groupId>
@@ -48,6 +49,7 @@ simba和simba-web
 <a name="ELleo"></a>
 <h2 id="一致性哈希工具">2.一致性哈希工具</h2>
 <a name="4UlGk"></a>
+
 #### 模块：
 Ocean
 <a name="4OoeL"></a>
@@ -84,6 +86,7 @@ public void registerMergeHook(BiConsumer<Pair<String, String>, ControlRange> mer
 <a name="GR5g0"></a>
 <h2 id="zookeeper客户端使用工具">3.zookeeper客户端使用工具</h2>
 <a name="d1z74"></a>
+
 #### 模块：
 Ocean
 <a name="6pIPn"></a>
@@ -129,6 +132,7 @@ public void addWatchPath(String... watchPath) {}
 <a name="Z3kVV"></a>
 <h2 id="高性能单机幂等工具">4.高性能单机幂等工具</h2>
 <a name="fN3AH"></a>
+
 #### 模块：
 Ocean
 <a name="1bK16"></a>
@@ -164,6 +168,7 @@ public Idempotency registerIsEmptyHook(Supplier<Boolean> isEmptyHook){}
 <a name="A5iCX"></a>
 <h2 id="对象尺寸计算工具">5.对象尺寸计算工具</h2>
 <a name="BFJtR"></a>
+
 #### 模块：
 Ocean
 <a name="US2HG"></a>
@@ -175,6 +180,7 @@ Ocean
 <a name="eQpEH"></a>
 <h2 id="BitMap工具">6.BitMap工具</h2>
 <a name="8VMRy"></a>
+
 #### 模块：
 Ocean
 <a name="t1F2O"></a>
@@ -202,6 +208,7 @@ public int count() {}
 <a name="wFchM"></a>
 <h2 id="时间差字符展示工具">7.时间差字符展示工具</h2>
 <a name="NDZFk"></a>
+
 #### 模块：
 Ocean
 <a name="eE2hf"></a>
@@ -222,6 +229,7 @@ public String parseWeeks(long time) {}
 <a name="0w4rz"></a>
 <h2 id="JSON格式化展示工具">8.JSON格式化展示工具</h2>
 <a name="SYJKg"></a>
+
 #### 模块：
 Ocean
 <a name="avWjP"></a>
@@ -238,6 +246,7 @@ public String parseJson(String str) {}
 <a name="aeNfY"></a>
 <h2 id="yaml读取和转换工具">9.yaml读取和转换工具</h2>
 <a name="kOjzS"></a>
+
 #### 模块：
 Ocean
 <a name="JjCaq"></a>
@@ -249,6 +258,7 @@ Ocean
 <a name="8PwSJ"></a>
 <h2 id="文件读取工具">10.文件读取工具</h2>
 <a name="TcvAw"></a>
+
 #### 模块：
 Ocean
 <a name="iefyo"></a>
@@ -260,6 +270,7 @@ Ocean
 <a name="EWYCM"></a>
 <h2 id="数据非可逆压缩">11.数据非可逆压缩</h2>
 <a name="mB2mS"></a>
+
 #### 模块：
 Ocean
 <a name="vpDM9"></a>
@@ -271,6 +282,7 @@ Ocean
 <a name="LUl3Q"></a>
 <h2 id="身份证解析工具">12.身份证解析工具</h2>
 <a name="hVsAW"></a>
+
 #### 模块：
 Ocean
 <a name="ghetN"></a>
@@ -282,6 +294,7 @@ Ocean
 <a name="srNyL"></a>
 <h2 id="分布式全局id">13.分布式全局id</h2>
 <a name="teM92"></a>
+
 #### 模块：
 Ocean
 <a name="acu1I"></a>
@@ -302,6 +315,7 @@ public Long getUid(){}
 <a name="SatLe"></a>
 <h2 id="jar包动态加载工具">14.jar包动态加载工具</h2>
 <a name="VLpS7"></a>
+
 #### 模块：
 Ocean
 <a name="P3QxH"></a>
@@ -330,6 +344,7 @@ public void read(File... jarPath) {}
 <a name="1x5yi"></a>
 <h2 id="布隆过滤器计算工具">15.布隆过滤器计算工具</h2>
 <a name="VmVb1"></a>
+
 #### 模块：
 Ocean
 <a name="09GJw"></a>
