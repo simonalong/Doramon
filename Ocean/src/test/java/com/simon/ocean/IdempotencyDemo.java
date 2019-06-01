@@ -58,65 +58,65 @@ public class IdempotencyDemo {
         idem.contain("aa");
     }
 
-    public void showRe(Idempotency idem, String tem) {
-        if (idem.contain(tem)) {
-            show("ok");
-        }
-        showSize(idem);
-    }
+//    public void showRe(Idempotency idem, String tem) {
+//        if (idem.contain(tem)) {
+//            show("ok");
+//        }
+//        showSize(idem);
+//    }
 
-    /**
-     * 多批量数据测试, 100个数据
-     */
-    @Test
-    public void test2() {
-
-        Idempotency idem = Idempotency.getInstance();
-        // 数据插入
-        int i = 0;
-        int size = 200 * 10000;
-        while (i < size) {
-            idem.contain("a" + i);
-            if (i < 100) {
-                showSize1(idem);
-            }
-            i++;
-        }
-
-        tab("总大小");
-        // 数据大小统计
-        show("size -- " + SizeUtil.strSizeOf(idem));
-
-        size = 400 * 10000;
-        while (i < size) {
-            idem.contain("a" + i);
-            if (i < 100) {
-                showSize1(idem);
-            }
-            i++;
-        }
-
-        tab("总大小");
-        show("size -- " + SizeUtil.strSizeOf(idem));
-
-        int j = 0;
-        while (true) {
-            showSize(idem);
-            if (j > 10) {
-                show("清理");
-            }
-            j++;
-        }
-    }
-
-    public void showSize1(Idempotency idem) {
-        show("size -- " + SizeUtil.strSizeOf(idem));
-    }
-
-    public void showSize(Idempotency idem) {
-        sleep(2);
-        show("idem    size -- " + SizeUtil.strSizeOf(idem));
-    }
+//    /**
+//     * 多批量数据测试, 100个数据
+//     */
+//    @Test
+//    public void test2() {
+//
+//        Idempotency idem = Idempotency.getInstance();
+//        // 数据插入
+//        int i = 0;
+//        int size = 200 * 10000;
+//        while (i < size) {
+//            idem.contain("a" + i);
+//            if (i < 100) {
+//                showSize1(idem);
+//            }
+//            i++;
+//        }
+//
+//        tab("总大小");
+//        // 数据大小统计
+//        show("size -- " + SizeUtil.strSizeOf(idem));
+//
+//        size = 400 * 10000;
+//        while (i < size) {
+//            idem.contain("a" + i);
+//            if (i < 100) {
+//                showSize1(idem);
+//            }
+//            i++;
+//        }
+//
+//        tab("总大小");
+//        show("size -- " + SizeUtil.strSizeOf(idem));
+//
+//        int j = 0;
+//        while (true) {
+//            showSize(idem);
+//            if (j > 10) {
+//                show("清理");
+//            }
+//            j++;
+//        }
+//    }
+//
+//    public void showSize1(Idempotency idem) {
+//        show("size -- " + SizeUtil.strSizeOf(idem));
+//    }
+//
+//    public void showSize(Idempotency idem) {
+//        sleep(2);
+//        show("idem    size -- " + SizeUtil.strSizeOf(idem));
+//    }
 
     /**
      * 多个数据的一起测试

@@ -296,36 +296,36 @@ Ocean
 <a name="teM92"></a>
 
 ```java
-/**
- * 对象方法的所有用法
- */
-@Test
-@SneakyThrows
-public void testParser(){
-    // 身份证号是随机编写的
-    String idCard = "410928199612336433";
-    // 获取单例对象
-    IdCardParser helper = IdCardParser.getInstance();
-    // 获取全国数据省市对应图
-    IdCardParser.initFromContent(FileUtil.readFromResource(this.getClass(), "/data/idAddress.json"));
-    helper.setIdCard(idCard);
+    /**
+     * 对象方法的所有用法
+     */
+    @Test
+    @SneakyThrows
+    public void testParser(){
+        // 随便写的一个身份证号
+        String idCard = "150125199002027411";
+        // 获取单例对象
+        IdCardParser helper = IdCardParser.getInstance();
+        // 获取全国数据省市对应图
+        IdCardParser.initFromContent(FileUtil.readFromResource(this.getClass(), "/data/idAddress.json"));
+        helper.setIdCard(idCard);
 
-    // 身份证号的可用性：true
-    show(helper.valid());
-    // 解析地址，前提是函数initFromContent 调用，并将省市数据注入进去；返回：浙江省嘉兴市海盐县
-    show(helper.parseAddress());
+        // 身份证号的可用性：true
+        show(helper.valid());
+        // 解析地址，前提是函数initFromContent 调用，并将省市数据注入进去；返回：内蒙古自治区呼和浩特市武川县
+        show(helper.parseAddress());
 
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    // 解析生日信息：返回：1991-02-22 00:00:00
-    show(format.format(helper.parseBirthday()));
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        // 解析生日信息：返回：1990-02-02 00:00:00
+        show(format.format(helper.parseBirthday()));
 
-    // 解析性别：男，女，未知；返回：男
-    show(helper.parseGender());
-    // 解析星座：返回：白羊座
-    show(helper.parseConstellation());
-    // 解析年龄：28
-    show(helper.parseAge());
-}
+        // 解析性别：男，女，未知；返回：男
+        show(helper.parseGender());
+        // 解析星座：返回：水瓶座
+        show(helper.parseConstellation());
+        // 解析年龄：29
+        show(helper.parseAge());
+    }
 ```
 
 #### 模块：
