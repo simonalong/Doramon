@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListMap;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -37,7 +38,7 @@ public class Idempotency {
     /**
      * 幂等性的数据缓存表，这里采用线程安全的有序的Map，通过expireTime和dataStr合并进行排序，从而得到按照时间排序的，删除和插入都比较方便
      */
-    private Map<String, Long> dataMap = new ConcurrentHashMap<>();
+    private ConcurrentSkipListMap<String, Long> dataMap = new ConcurrentSkipListMap<>();
     /**
      * 过期时间单位设置：默认设置为20秒，向后延长20的mills
      */
@@ -211,6 +212,8 @@ public class Idempotency {
         // 如果设置了第三方配置，则对于超过阈值的数据则将数据存到第三方
         if (null != insertHook) {
             hookExecutor.execute(() -> insertHook.accept(key, System.currentTimeMillis() + backExpireTimeMills));
+        }else{
+            // 若没有设置第三方，则通过LRU覆盖对应的数据
         }
     }
 
