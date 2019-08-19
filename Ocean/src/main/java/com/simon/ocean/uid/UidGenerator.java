@@ -1,9 +1,8 @@
 package com.simon.ocean.uid;
 
-import com.simon.neo.Neo;
-import com.simon.neo.NeoMap;
-import com.simon.neo.exception.RefreshRatioException;
-import com.simon.neo.uid.RangeStartManager;
+import com.simonalong.neo.Neo;
+import com.simonalong.neo.NeoMap;
+import com.simonalong.neo.exception.RefreshRatioException;
 import java.util.concurrent.atomic.AtomicLong;
 
 /**

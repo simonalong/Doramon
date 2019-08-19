@@ -23,7 +23,7 @@
             <artifactId>okhttp</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.simon.cloud</groupId>
+            <groupId>com.github.simonalong</groupId>
             <artifactId>Neo</artifactId>
         </dependency>
         <dependency>

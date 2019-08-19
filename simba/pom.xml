@@ -31,7 +31,7 @@
             <artifactId>mysql-connector-java</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.simon.cloud</groupId>
+            <groupId>com.github.simonalong</groupId>
             <artifactId>Neo</artifactId>
         </dependency>
     </dependencies>

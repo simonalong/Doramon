@@ -21,7 +21,7 @@
     <properties>
         <lombok.version>1.16.22</lombok.version>
         <freemarker.version>2.3.28</freemarker.version>
-        <neo.version>0.3.1-SNAPSHOT</neo.version>
+        <neo.version>0.3.2</neo.version>
         <okhttp.version>3.14.0</okhttp.version>
         <fastjson.version>1.2.29</fastjson.version>
         <zookeeper.version>3.4.14</zookeeper.version>
@@ -31,11 +31,6 @@
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>com.simon.eog</groupId>
-                <artifactId>common</artifactId>
-                <version>1.0-SNAPSHOT</version>
-            </dependency>
             <!--模板引擎-->
             <dependency>
                 <groupId>org.freemarker</groupId>
@@ -44,10 +39,11 @@
             </dependency>
             <!--orm框架-->
             <dependency>
-                <groupId>com.simon.cloud</groupId>
+                <groupId>com.github.simonalong</groupId>
                 <artifactId>Neo</artifactId>
                 <version>${neo.version}</version>
             </dependency>
+
             <!--网络框架依赖-->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>

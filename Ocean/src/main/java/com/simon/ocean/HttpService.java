@@ -1,7 +1,7 @@
 package com.simon.ocean;
 
 import com.alibaba.fastjson.JSON;
-import com.simon.neo.NeoMap;
+import com.simonalong.neo.NeoMap;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
