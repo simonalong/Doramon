@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 public class StringTypeUtil {
 
     /**
-     * 专门用于解析json对应的string到界面回车的显示
+     * 专门用于解析json对应的string到界面回车的显示，即反向解压json
      */
     public String parseJson(String str) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -23,9 +23,8 @@ public class StringTypeUtil {
         //[]这个括号内部的逗号不替换
         boolean leftFlag = false;
         char[] charList = str.toCharArray();
-        int leftCout = 0;
-        for (int i = 0; i < charList.length; i++) {
-            char c = charList[i];
+        int leftCount = 0;
+        for (char c : charList) {
             if (c == ',') {
                 if (leftFlag) {
                     stringBuilder.append(c);
@@ -33,24 +32,22 @@ public class StringTypeUtil {
                 }
                 stringBuilder.append(",\n");
                 if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCout));
+                    stringBuilder.append(addSpace(leftCount));
                 }
             } else if (c == '{') {
                 stringBuilder.append("\n");
                 if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCout));
+                    stringBuilder.append(addSpace(leftCount));
                 }
                 spaceFlag = true;
                 stringBuilder.append("{\n");
-                leftCout++;
-                if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCout));
-                }
+                leftCount++;
+                stringBuilder.append(addSpace(leftCount));
             } else if (c == '}') {
-                leftCout--;
+                leftCount--;
                 stringBuilder.append("\n");
                 if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCout));
+                    stringBuilder.append(addSpace(leftCount));
                 }
                 stringBuilder.append("}");
             } else if (c == '[') {
@@ -66,14 +63,13 @@ public class StringTypeUtil {
         return stringBuilder.toString();
     }
 
-    public String addSpace(int count) {
+    private String addSpace(int count) {
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < count; i++) {
             stringBuilder.append("     ");
         }
         return stringBuilder.toString();
     }
-
 
     /**
      * 数组toString的字符串转换过来

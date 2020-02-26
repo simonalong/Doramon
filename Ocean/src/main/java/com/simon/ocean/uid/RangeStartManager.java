@@ -1,6 +1,6 @@
 package com.simon.ocean.uid;
 
-import com.simon.neo.Neo;
+import com.simonalong.neo.Neo;
 import lombok.extern.slf4j.Slf4j;
 
 /**

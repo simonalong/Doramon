@@ -1,6 +1,9 @@
 package com.simon.ocean;
 
+import static javax.management.timer.Timer.*;
+
 import java.util.Date;
+import javax.management.timer.Timer;
 import lombok.experimental.UtilityClass;
 
 /**
@@ -11,31 +14,6 @@ import lombok.experimental.UtilityClass;
  */
 @UtilityClass
 public class TimeStrUtil {
-
-    /**
-     * 我们这里最小的单位是毫秒
-     */
-    private static final long MILLIS = 1;
-    /**
-     * 秒
-     */
-    private static final long SECOND = 1000 * MILLIS;
-    /**
-     * 分钟
-     */
-    private static final long MINUTE = 60 * SECOND;
-    /**
-     * 小时
-     */
-    private static final long HOUR = 60 * MINUTE;
-    /**
-     * 天
-     */
-    private static final long DAY = 24 * HOUR;
-    /**
-     * 周
-     */
-    private static final long WEEK = 7 * DAY;
 
     /**
      * 计算两个时间的差值，用字符表示
@@ -78,9 +56,9 @@ public class TimeStrUtil {
     public String parseWeeks(long time) {
         StringBuilder sb = new StringBuilder();
         if (canWeek(time)) {
-            sb.append(time / WEEK).append("周 ").append(parseDays(time % WEEK));
+            sb.append(time / Timer.ONE_WEEK).append("周 ").append(parseDays(time % Timer.ONE_WEEK));
         } else {
-            sb.append(parseDays(time % WEEK));
+            sb.append(parseDays(time % Timer.ONE_WEEK));
         }
         return sb.toString();
     }
@@ -91,9 +69,9 @@ public class TimeStrUtil {
     private String parseDays(long time) {
         StringBuilder sb = new StringBuilder();
         if (canDay(time)) {
-            sb.append(time / DAY).append("天 ").append(parseHours(time % DAY));
+            sb.append(time / ONE_DAY).append("天 ").append(parseHours(time % ONE_DAY));
         } else {
-            sb.append(parseHours(time % DAY));
+            sb.append(parseHours(time % ONE_DAY));
         }
         return sb.toString();
     }
@@ -104,9 +82,9 @@ public class TimeStrUtil {
     private String parseHours(long time) {
         StringBuilder sb = new StringBuilder();
         if (canHour(time)) {
-            sb.append(time / HOUR).append("小时 ").append(parseMinutes(time % HOUR));
+            sb.append(time / ONE_HOUR).append("小时 ").append(parseMinutes(time % ONE_HOUR));
         } else {
-            sb.append(parseMinutes(time % HOUR));
+            sb.append(parseMinutes(time % ONE_HOUR));
         }
         return sb.toString();
     }
@@ -117,9 +95,9 @@ public class TimeStrUtil {
     private String parseMinutes(long time) {
         StringBuilder sb = new StringBuilder();
         if (canMinute(time)) {
-            sb.append(time / MINUTE).append("分钟 ").append(parseSeconds(time % MINUTE));
+            sb.append(time / ONE_MINUTE).append("分钟 ").append(parseSeconds(time % ONE_MINUTE));
         } else {
-            sb.append(parseSeconds(time % MINUTE));
+            sb.append(parseSeconds(time % ONE_MINUTE));
         }
         return sb.toString();
     }
@@ -130,9 +108,9 @@ public class TimeStrUtil {
     private String parseSeconds(long time) {
         StringBuilder sb = new StringBuilder();
         if (canSecond(time)) {
-            sb.append(time / SECOND).append("秒 ").append(parseMillis(time % SECOND));
+            sb.append(time / ONE_SECOND).append("秒 ").append(parseMillis(time % ONE_SECOND));
         } else {
-            sb.append(parseMillis(time % SECOND));
+            sb.append(parseMillis(time % ONE_SECOND));
         }
         return sb.toString();
     }
@@ -149,26 +127,26 @@ public class TimeStrUtil {
     }
 
     private boolean canWeek(long time) {
-        return time > WEEK;
+        return time > ONE_WEEK;
     }
 
     private boolean canDay(long time) {
-        return time > DAY;
+        return time > ONE_DAY;
     }
 
     private boolean canHour(long time) {
-        return time > HOUR;
+        return time > ONE_HOUR;
     }
 
     private boolean canMinute(long time) {
-        return time > MINUTE;
+        return time > ONE_MINUTE;
     }
 
     private boolean canSecond(long time) {
-        return time > SECOND;
+        return time > ONE_SECOND;
     }
 
     private boolean canMillis(long time) {
-        return time > MILLIS;
+        return time > 1;
     }
 }
