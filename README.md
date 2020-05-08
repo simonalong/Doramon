@@ -31,20 +31,10 @@ simba和simba-web
 #### 说明：
 该工具执行完成之后，可以直接生成一个具备这样功能的控制台，增删改查，分页查询，界面搜索字段可以配置（根据字段是普通的还是枚举还是时间，分别对应输入框、下拉框和时间范围选择框），此外，如果字段是图片，还可以配置成图片展示，如果是时间则按照时间展示。<br />该工具分为两个类，前端一个后端一个，生成时候分别配置响应的参数，启动即可生成响应的配置，前端尽量使用simba-web这个作为基础模块，后端只需要创建好完全的空项目即可生成可执行的，但是maven的pom中需要引入如下几个。前后端执行完之后，运行，即可具备增删改查分页等各种常见的功能
 
-```xml
-<dependency>
-  <groupId>org.springframework.boot</groupId>
-  <artifactId>spring-boot-starter-web</artifactId>
-</dependency>
-<dependency>
-  <groupId>com.simon.cloud</groupId>
-  <artifactId>Neo</artifactId>
-</dependency>
-<dependency>
-  <groupId>org.projectlombok</groupId>
-  <artifactId>lombok</artifactId>
-</dependency>
-```
+注意：
+该工具由于功能太多，因此独立出来为
+[Simba](https://github.com/SimonAlong/Simba)：脚手架工具
+[Simba-base-front](https://github.com/SimonAlong/Simba-base-front)：脚手架工具中的前端模板
 
 <a name="ELleo"></a>
 <h2 id="一致性哈希工具">2.一致性哈希工具</h2>
@@ -291,9 +281,6 @@ Ocean
 <a name="1Rva4"></a>
 #### 说明：
 提供身份证号码，可以通过身份证解析各种信息<br />1.解析地址：比如：安徽省合肥市庐阳区<br />2.解析生日：比如：19890312<br />3.解析男女：比如：男<br />4.解析星座（默认上面生日是阳历，如果是阴历则不准确）：比如：双鱼座<br />5.解析年龄：比如：23<br />6.检验身份证号有效性：
-<a name="srNyL"></a>
-<h2 id="分布式全局id">13.分布式全局id</h2>
-<a name="teM92"></a>
 
 ```java
     /**
@@ -327,23 +314,20 @@ Ocean
         show(helper.parseAge());
     }
 ```
+<a name="srNyL"></a>
+<h2 id="分布式全局id">13.分布式全局id</h2>
+<a name="teM92"></a>
 
-#### 模块：
-Ocean
-<a name="acu1I"></a>
-#### 技术：
-类：UidGenerator
-<a name="68oap"></a>
-#### 说明：
-基于数据库，采用64Bit的long进行全局生成，采用双buf缓存，可以平滑的高性能生成全局id
+该分布式id生成器，彻底解决了雪花算法存在的三个问题：
+1.时间回拨问题
+2.workerId的分配和回收问题
+3.workerId的上限问题
 
-```java
-// 单例模式，Neo是数据库的对象，默认步长1万，刷新比例0.2
-public static UidGenerator getInstance(Neo neo){}
-// 单例模式，Neo是数据库的对象
-public static UidGenerator getInstance(Neo neo, Integer stepSize, Float refreshRatio){}
-public Long getUid(){}
-```
+其中业内对于前两个问题的解决方式都不是很完美，或者说是没有完全解决，而第三个问题，则就完全没有考虑。在这里Butterfly对上面三个问题进行了彻底的解决。算是完美解决了雪花算法存在的所有问题，而且性能比雪花算法还要高。
+
+注意：
+由于该功能方案比较复杂，已经独立出去，重新命名为Butterfly
+[Butterfly](https://github.com/SimonAlong/Butterfly)
 
 <a name="SatLe"></a>
 <h2 id="jar包动态加载工具">14.jar包动态加载工具</h2>

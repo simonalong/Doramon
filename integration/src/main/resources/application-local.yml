@@ -1,7 +1,0 @@
-server:
-  port: 9220
-spring:
-  datasource:
-    url: jdbc:mysql://127.0.0.1:3306/king?useUnicode=true&characterEncoding=UTF-8&useSSL=false
-    username: neo_test
-    password: neo@Test123
