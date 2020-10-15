@@ -74,6 +74,7 @@ public class YamlUtil {
             yaml.loadAs(ymlContent, Map.class);
             return true;
         } catch (YAMLException e) {
+            log.error("不是yml类型，因为异常：", e);
             return false;
         }
     }
@@ -160,7 +161,10 @@ public class YamlUtil {
         }
     }
 
-    private List<String> getPropertiesItemLineList(String propertiesContent) {
+    public List<String> getPropertiesItemLineList(String propertiesContent) {
+        if (null == propertiesContent) {
+            return Collections.emptyList();
+        }
         String[] lineList = propertiesContent.split(PROPERTY_NEW_LINE);
         List<String> itemLineList = new ArrayList<>();
         StringBuilder stringBuilder = new StringBuilder();
@@ -256,7 +260,7 @@ public class YamlUtil {
         }
         try {
             String propertiesContent = ymlToProperties(ymlContent);
-            return Arrays.stream(propertiesContent.split(PROPERTY_NEW_LINE)).map(e -> {
+            return getPropertiesItemLineList(propertiesContent).stream().map(e -> {
                 int index = e.indexOf("=");
                 String key = e.substring(0, index);
                 String value = e.substring(index + 1);
@@ -349,16 +353,20 @@ public class YamlUtil {
                     propertiesValue = value;
                     break;
                 case STRING:
-                    return key + "=" + value;
+                    if (value.contains(":") || value.contains("=")) {
+                        return key + "=" + "'" + value + "'";
+                    } else {
+                        return key + "=" + value;
+                    }
+
                 default:
                     break;
             }
 
-            assert propertiesValue != null;
-            propertiesValue = Arrays.stream(propertiesValue.split(PROPERTY_NEW_LINE)).map(e -> {
+            propertiesValue = getPropertiesItemLineList(propertiesValue).stream().map(e -> {
                 int index = e.indexOf("=");
-                String keyTem = e.substring(0, index);
-                String valueTem = e.substring(index + 1);
+                String keyTem = e.substring(0, index).trim();
+                String valueTem = e.substring(index + 1).trim();
                 return key + DOT + keyTem + "=" + valueTem;
             }).reduce((a, b) -> a + PROPERTY_NEW_LINE + b).orElse("");
             return propertiesValue;
@@ -568,6 +576,9 @@ public class YamlUtil {
             Set<?> set = map.keySet();
             for (Object key : set) {
                 Object value = map.get(key);
+                if(null == value) {
+                    value = "";
+                }
                 if (value instanceof Map) {
                     formatYmlToProperties(propertiesLineList, value, prefixWithDOT(prefix) + key);
                 } else if (value instanceof Collection) {
