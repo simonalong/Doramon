@@ -1,0 +1,4 @@
+app.id=speech
+_new_line_: 1
+knowledge.init..knowledgeTitles[0].kdTitle=听不清
+_new_line_: 1

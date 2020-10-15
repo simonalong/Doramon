@@ -1,7 +1,6 @@
 package com.simon.ocean;
 
-import static com.simon.ocean.Out.show;
-import static com.simon.ocean.Out.tab;
+import static com.simon.ocean.Out.*;
 
 import org.junit.Assert;
 import org.junit.BeforeClass;
