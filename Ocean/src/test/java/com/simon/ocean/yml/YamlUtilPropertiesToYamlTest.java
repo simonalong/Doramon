@@ -8,9 +8,9 @@ import org.junit.Test;
 
 /**
  * @author shizi
- * @since 2020/10/10 5:20 下午
+ * @since 2020/10/16 8:38 下午
  */
-public class YamlUtilPropertiesToYmlTest {
+public class YamlUtilPropertiesToYamlTest {
 
     /**
      * 基本测试
@@ -20,9 +20,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlBaseTest() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/base.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/base.yml");
+    public void propertiesToYamlBaseTest() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/base.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/base.yml");
 
         //a:
         //  b:
@@ -33,7 +33,7 @@ public class YamlUtilPropertiesToYmlTest {
         //    c1:
         //      d1:
         //        e1: 1
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -55,9 +55,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlBase1Test() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/base1.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/base1.yml");
+    public void propertiesToYamlBase1Test() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/base1.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/base1.yml");
 
         //# 总的
         //a:
@@ -78,7 +78,7 @@ public class YamlUtilPropertiesToYmlTest {
         //        - 3
         //        - 3
         //        - 3
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -91,9 +91,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest1() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array1.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array1.yml");
+    public void propertiesToYamlArrayTest1() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array1.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array1.yml");
         //a:
         //  b:
         //    c:
@@ -102,7 +102,7 @@ public class YamlUtilPropertiesToYmlTest {
         //      - e: 3
         //    d:
         //      e: 4
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -118,9 +118,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest2() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array2.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array2.yml");
+    public void propertiesToYamlArrayTest2() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array2.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array2.yml");
         //a:
         //  b:
         //    c:
@@ -132,7 +132,7 @@ public class YamlUtilPropertiesToYmlTest {
         //        f: 6
         //    d:
         //      e: 7
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -146,9 +146,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest3() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array3.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array3.yml");
+    public void propertiesToYamlArrayTest3() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array3.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array3.yml");
         //a:
         //  b:
         //    c:
@@ -160,7 +160,7 @@ public class YamlUtilPropertiesToYmlTest {
         //          - 4
         //    d:
         //      e: 5
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -170,14 +170,14 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest4() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array4.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array4.yml");
+    public void propertiesToYamlArrayTest4() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array4.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array4.yml");
         //a:
         //  b:
         //    c:
         //      - 1
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -192,9 +192,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest5() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array5.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array5.yml");
+    public void propertiesToYamlArrayTest5() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array5.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array5.yml");
         // a:
         //  b:
         //    c:
@@ -208,7 +208,7 @@ public class YamlUtilPropertiesToYmlTest {
         //      - 5
         //    d:
         //      e: 6
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -219,16 +219,16 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest6() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array6.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array6.yml");
+    public void propertiesToYamlArrayTest6() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array6.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array6.yml");
         //a:
         //  b:
         //    e:
         //      - 2
         //    d:
         //      e: 3
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -243,9 +243,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlArrayTest7() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/array7.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/array7.yml");
+    public void propertiesToYamlArrayTest7() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/array7.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/array7.yml");
 
         //knowledge:
         //  init:
@@ -257,7 +257,7 @@ public class YamlUtilPropertiesToYmlTest {
         //        - 你好
         //        - hello
         //        - hi
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 
     /**
@@ -269,9 +269,9 @@ public class YamlUtilPropertiesToYmlTest {
      */
     @SneakyThrows
     @Test
-    public void propertiesToYmlMultiLineTest() {
-        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/multi_line.properties");
-        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/multi_line.yml");
+    public void propertiesToYamlMultiLineTest() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/multi_line.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/multi_line.yml");
 
         //isc:
         //  log:
@@ -279,6 +279,6 @@ public class YamlUtilPropertiesToYmlTest {
         //      root:dell@123:10.30.30.33:22
         //      root:dell@123:10.30.30.34:22
         //      root:dell@123:10.30.30.35:22
-        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
     }
 }
