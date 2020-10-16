@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
-import org.yaml.snakeyaml.error.YAMLException;
 
 import java.util.*;
 import java.util.regex.Matcher;
