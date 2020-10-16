@@ -26,7 +26,6 @@ public class YamlUtilYmlToPropertiesTest {
      *       d1:
      *         e1: 1
      */
-    // 其中 _config_new_line_: 1 是内部固定字符
     @SneakyThrows
     @Test
     public void ymlToPropertiesBaseTest() {
@@ -34,6 +33,51 @@ public class YamlUtilYmlToPropertiesTest {
         String ymlContent = FileUtil.readFromResource(YamlUtilYmlToPropertiesTest.class, "/yml/base.yml");
         //a.b.c.d.e=1
         //a.b1.c1.d1.e1=1
+        Assert.assertEquals(propertiesContent.trim(), YamlUtil.ymlToProperties(ymlContent).trim());
+    }
+
+    /**
+     * 基本测试：带注释
+     *
+     * # 总的
+     * a:
+     *   b:
+     *     c: 1 # test
+     *   b1:
+     *     c:
+     *       d:
+     *         e: 1 # 测试1
+     *   b2:
+     *     c1:
+     *       d1:
+     *         e1: 1 # 用来说明xxx
+     *         e2: 2
+     *         e3: 3
+     *       # 数组
+     *       d2:
+     *         - 3
+     *         - 3
+     *         - 3
+     */
+    @SneakyThrows
+    @Test
+    public void propertiesToYmlBase1Test() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilYmlToPropertiesTest.class, "/properties/base1.properties");
+        String ymlContent = FileUtil.readFromResource(YamlUtilYmlToPropertiesTest.class, "/yml/base1.yml");
+
+        //# 总的
+        //# test
+        //a.b.c=1
+        //# 测试1
+        //a.b1.c.d.e=1
+        //# 用来说明xxx
+        //a.b2.c1.d1.e1=1
+        //a.b2.c1.d1.e2=2
+        //a.b2.c1.d1.e3=3
+        //# 数组
+        //a.b2.c1.d2[0]=3
+        //a.b2.c1.d2[1]=3
+        //a.b2.c1.d2[2]=3
         Assert.assertEquals(propertiesContent.trim(), YamlUtil.ymlToProperties(ymlContent).trim());
     }
 
@@ -99,10 +143,10 @@ public class YamlUtilYmlToPropertiesTest {
      *     c:
      *       - d: 1
      *       - e:
-     *         - 2
-     *         - 3
+     *           - 2
+     *           - 3
      *       - e:
-     *         - 4
+     *           - 4
      *     d:
      *       e: 5
      */

@@ -60,5 +60,9 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.amihaiemil.web</groupId>
+            <artifactId>eo-yaml</artifactId>
+        </dependency>
     </dependencies>
 </project>

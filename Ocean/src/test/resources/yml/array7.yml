@@ -5,6 +5,6 @@ knowledge:
         keyWords: '[你说什么，没听清，听不清楚，再说一遍]'
         question: '[没听懂，听不清楚]'
       - kdInfos:
-        - 你好
-        - hello
-        - hi
+          - 你好
+          - hello
+          - hi

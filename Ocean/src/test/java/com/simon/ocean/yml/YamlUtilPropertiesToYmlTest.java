@@ -37,6 +37,51 @@ public class YamlUtilPropertiesToYmlTest {
     }
 
     /**
+     * 基本测试：带注释
+     *
+     * # 总的
+     * # test
+     * a.b.c=1
+     * # 测试1
+     * a.b1.c.d.e=1
+     * # 用来说明xxx
+     * a.b2.c1.d1.e1=1
+     * a.b2.c1.d1.e2=2
+     * a.b2.c1.d1.e3=3
+     * # 数组
+     * a.b2.c1.d2[0]=3
+     * a.b2.c1.d2[1]=3
+     * a.b2.c1.d2[2]=3
+     */
+    @SneakyThrows
+    @Test
+    public void propertiesToYmlBase1Test() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/properties/base1.properties");
+        String ymlContent = FileUtil.readFromResource(YamlUtilPropertiesToYmlTest.class, "/yml/base1.yml");
+
+        //# 总的
+        //a:
+        //  b:
+        //    c: 1 # test
+        //  b1:
+        //    c:
+        //      d:
+        //        e: 1 # 测试1
+        //  b2:
+        //    c1:
+        //      d1:
+        //        e1: 1 # 用来说明xxx
+        //        e2: 2
+        //        e3: 3
+        //      # 数组
+        //      d2:
+        //        - 3
+        //        - 3
+        //        - 3
+        Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
+    }
+
+    /**
      * 数组测试1
      *
      * a.b.c[0].d=1
@@ -109,10 +154,10 @@ public class YamlUtilPropertiesToYmlTest {
         //    c:
         //      - d: 1
         //      - e:
-        //        - 2
-        //        - 3
+        //          - 2
+        //          - 3
         //      - e:
-        //        - 4
+        //          - 4
         //    d:
         //      e: 5
         Assert.assertEquals(ymlContent.trim(), YamlUtil.propertiesToYml(propertiesContent).trim());
