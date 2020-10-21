@@ -25,6 +25,9 @@ import java.util.stream.Collectors;
  *     <li>6.map 转 yml</li>
  *     <li>7.yml 转 kvList</li>
  *     <li>8.kvList 转 yml</li>
+ *     <li>9.kv 转 map</li>
+ *     <li>10.kv 转 properties</li>
+ *     <li>11.kv 转 yml</li>
  * </ul>
  *
  * @author shizi
@@ -34,6 +37,10 @@ import java.util.stream.Collectors;
 @UtilityClass
 public class YamlUtil {
 
+    /**
+     * 注释标识
+     */
+    private final String REMARK_PRE = "# ";
     /**
      * 换行符
      */
@@ -69,10 +76,10 @@ public class YamlUtil {
             return false;
         }
         try {
-            yamlToMap(yamlContent);
+            yamlToProperties(yamlContent);
             return true;
         } catch (RuntimeException e) {
-            log.error("不是yaml类型，因为异常：", e);
+            log.error("不是严格yaml类型，因为异常：", e);
             return false;
         }
     }
@@ -81,7 +88,12 @@ public class YamlUtil {
         if (null == propertiesContent || "".equals(propertiesContent)) {
             return false;
         }
-        return isYaml(propertiesToYaml(propertiesContent));
+        try {
+            return isYaml(propertiesToYaml(propertiesContent));
+        } catch (RuntimeException e) {
+            log.error("不是严格properties类型，因为异常：", e);
+            return false;
+        }
     }
 
     public boolean isJson(String jsonContent) {
@@ -89,6 +101,7 @@ public class YamlUtil {
             JSON.parseObject(jsonContent);
             return true;
         } catch (Throwable e) {
+            log.error("不是严格json类型，因为异常：", e);
             return false;
         }
     }
@@ -107,8 +120,8 @@ public class YamlUtil {
             Map<String, Object> valueMap = yamlToMap(yamlContent);
 
             // 读取yaml的注释
-            yamlToRemarkMap(remarkMap, com.amihaiemil.eoyaml.Yaml.createYamlInput(yamlContent).readYamlMapping(), "");
-            formatyamlToProperties(propertiesList, remarkMap, valueMap, "");
+            yamlToRemarkMap(remarkMap, Yaml.createYamlInput(yamlContent).readYamlMapping(), "");
+            formatYamlToProperties(propertiesList, remarkMap, valueMap, "");
             return propertiesList.stream().filter(e-> null != e && !"".equals(e)).reduce((a, b) -> a + PROPERTY_NEW_LINE + b).orElse("");
         } catch (Throwable e) {
             log.error("yamlToProperties error, yamlContent={}", yamlContent);
@@ -168,8 +181,11 @@ public class YamlUtil {
                     projectRemark.delete(0, projectRemark.length());
                 }
             }
-            formatPropertiesToyaml(yamlLineList, yamlNodes, false, "");
-            return yamlLineList.stream().reduce((a, b) -> a + "\n" + b).orElse("") + "\n";
+            formatPropertiesToYaml(yamlLineList, yamlNodes, false, "");
+            String originalYaml = yamlLineList.stream().reduce((a, b) -> a + "\n" + b).orElse("") + "\n";
+
+            // 给yaml的顶层点添加上层换行
+            return appendNextLine(originalYaml);
         } catch (Throwable e) {
             log.error("propertiesToyaml error, propertiesContent={}", propertiesContent);
             throw new RuntimeException("properties 转换到 yaml异常", e);
@@ -178,19 +194,26 @@ public class YamlUtil {
 
     /**
      * yaml 转 map
+     *
+     * 由于eo-yaml对map转换支持会默认将一些key添加字符，这里就用snakeyaml工具做
      */
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({"unchecked", "rawtypes"})
     public Map<String, Object> yamlToMap(String yamlContent) {
         if (null == yamlContent || "".equals(yamlContent)) {
             return new HashMap<>();
         }
         try {
-            String yaml = yamlContentAfterFix(yamlContent);
-            YamlMapping mapping = com.amihaiemil.eoyaml.Yaml.createYamlInput(yaml).readYamlMapping();
-            return (Map<String, Object>)parseValue(mapping);
+            Map<String, Object> resultMap = new HashMap<>();
+            org.yaml.snakeyaml.Yaml yml = new org.yaml.snakeyaml.Yaml();
+            Map result = yml.load(yamlContent);
+            Set<Map.Entry<?, ?>> entrySet = result.entrySet();
+            for (Map.Entry<?, ?> entry : entrySet) {
+                resultMap.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+            return resultMap;
         } catch (Throwable e) {
-            log.error("yamlToMap error, yamlContent={}", yamlContent, e);
-            throw new RuntimeException("yaml 转换到 map 异常", e);
+            log.error("ymlToMap error, yamlContent={}", yamlContent, e);
+            throw new RuntimeException("yml 转换到 map 异常", e);
         }
     }
 
@@ -202,7 +225,17 @@ public class YamlUtil {
             return null;
         }
 
-        return Yaml.createYamlDump(mapData).dump().toString();
+        try {
+            org.yaml.snakeyaml.Yaml yaml = new org.yaml.snakeyaml.Yaml();
+            String originalYaml = yaml.dumpAsMap(mapData);
+            // 由于snakeyaml对数组缩进支持不够好，这里做一层缩进
+            originalYaml = yamlFormatToAppendArray(originalYaml);
+
+            return appendNextLine(originalYaml);
+        } catch (Throwable e) {
+            log.error("mapToYml error, mapData={}", mapData);
+            throw new RuntimeException("map 转换到 yml 异常", e);
+        }
     }
 
     /**
@@ -308,6 +341,10 @@ public class YamlUtil {
         }
     }
 
+    public String kvToProperties(String key, String value, ConfigValueTypeEnum valueTypeEnum) {
+        return kvToProperties(key, value, null, valueTypeEnum);
+    }
+
     /**
      * k-v的String类型转properties
      *
@@ -315,15 +352,22 @@ public class YamlUtil {
      *
      * @param key           主键
      * @param value         待转换的值
+     * @param desc          注释
      * @param valueTypeEnum 值的类型，0：yaml，1：properties，2：json，3：string
      * @return 转换之后的yaml类型
      */
-    public String kvToProperties(String key, String value, ConfigValueTypeEnum valueTypeEnum) {
+    public String kvToProperties(String key, String value, String desc, ConfigValueTypeEnum valueTypeEnum) {
         if (null == key || "".equals(key)) {
             return null;
         }
+
         try {
             // 将value对应的值先转换为properties类型，然后对key进行拼接，最后再统一转化为yaml格式
+            StringBuilder propertiesResult = new StringBuilder();
+            if(null != desc && !"".equals(desc)) {
+                propertiesResult.append("# ").append(desc).append("\n");
+            }
+
             String propertiesValue = "";
             switch (valueTypeEnum) {
                 case YAML:
@@ -352,11 +396,74 @@ public class YamlUtil {
                 String valueTem = e.substring(index + 1).trim();
                 return key + DOT + keyTem + "=" + valueTem;
             }).reduce((a, b) -> a + PROPERTY_NEW_LINE + b).orElse("");
-            return propertiesValue;
+
+            propertiesResult.append(propertiesValue);
+            return propertiesResult.toString();
         } catch (Throwable e) {
             log.error("kvToProperties error, key={}, value={}, valueType={}", key, value, valueTypeEnum.name(), e);
             throw new RuntimeException("kv 转换到 properties 异常", e);
         }
+    }
+
+    /**
+     * 给yaml格式的内容中的数组部分多增一层缩进， eo-yaml格式解析比较严格
+     */
+    private String yamlFormatToAppendArray(String yamlContent) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] items = yamlContent.split("\n");
+        Integer blankSize = null;
+        for (String item : items) {
+            if (item.trim().startsWith("- ")) {
+                int index = item.indexOf("- ");
+                if(null == blankSize) {
+                    blankSize = item.substring(0, index).length();
+                    stringBuilder.append(INDENT_BLANKS).append(item).append("\n");
+                } else {
+                    int itemBlank = item.substring(0, index).length();
+                    if (itemBlank > blankSize) {
+                        stringBuilder.append(INDENT_BLANKS).append(INDENT_BLANKS).append(item).append("\n");
+                    } else {
+                        stringBuilder.append(INDENT_BLANKS).append(item).append("\n");
+                    }
+                }
+            } else {
+                if (null == blankSize) {
+                    stringBuilder.append(item).append("\n");
+                } else {
+                    int itemBlankSize = item.substring(0, item.indexOf(item.trim())).length();
+                    if (itemBlankSize > blankSize) {
+                        stringBuilder.append(INDENT_BLANKS).append(item).append("\n");
+                    } else {
+                        stringBuilder.append(item).append("\n");
+                        blankSize = null;
+                    }
+                }
+            }
+        }
+        return stringBuilder.toString();
+    }
+
+    /**
+     * 给yaml的头部key添加换行
+     */
+    private String appendNextLine(String yamlContent) {
+        StringBuilder stringBuilder = new StringBuilder();
+        String[] items = yamlContent.split("\n");
+        boolean head = true;
+        for (String item : items) {
+            int itemBlankSize = item.substring(0, item.indexOf(item.trim())).length();
+            if (0 == itemBlankSize) {
+                if (head) {
+                    stringBuilder.append(item).append("\n");
+                    head = false;
+                }else {
+                    stringBuilder.append("\n").append(item).append("\n");
+                }
+            } else {
+                stringBuilder.append(item).append("\n");
+            }
+        }
+        return stringBuilder.toString();
     }
 
     public List<String> getPropertiesItemLineList(String propertiesContent) {
@@ -377,50 +484,6 @@ public class YamlUtil {
             }
         }
         return itemLineList;
-    }
-
-    private String yamlContentAfterFix(String yamlContent) {
-        StringBuilder stringBuilder = new StringBuilder();
-        String[] items = yamlContent.split("\n");
-        for (String item : items) {
-            if (item.trim().startsWith("- ") && item.trim().contains(": ")) {
-                int index = item.indexOf("- ");
-                stringBuilder.append(item, 0, index).append("- ").append("\n");
-                stringBuilder.append(item, 0, index).append("  ").append(item.substring(index + 2)).append("\n");
-            } else {
-                stringBuilder.append(item).append("\n");
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    private Object parseValue(YamlNode yamlNode) {
-        Node node = yamlNode.type();
-        switch (node){
-            case MAPPING:
-                YamlMapping yamlMapping = yamlNode.asMapping();
-                Map<String, Object> valueMap = new LinkedHashMap<>();
-                for (YamlNode nodeKey : yamlMapping.keys()) {
-                    String nodeName = nodeKey.asScalar().value();
-                    valueMap.put(nodeName, parseValue(yamlMapping.value(nodeKey)));
-                }
-                return valueMap;
-            case SCALAR:
-                Scalar scalar = yamlNode.asScalar();
-                return scalar.value();
-            case STREAM:
-                YamlStream yamlStream = yamlNode.asStream();
-                return yamlStream.collect(Collectors.toList());
-            case SEQUENCE:
-                YamlSequence yamlSequence = yamlNode.asSequence();
-                List<Object> valueList = new ArrayList<>();
-                for (YamlNode yamlNodeTem : yamlSequence.values()) {
-                    valueList.add(parseValue(yamlNodeTem));
-                }
-                return valueList;
-            default:
-                return "";
-        }
     }
 
     /**
@@ -615,7 +678,7 @@ public class YamlUtil {
             .orElse(valueTem);
     }
 
-    private void formatPropertiesToyaml(List<String> yamlLineList, List<yamlNode> yamlNodes, Boolean lastNodeArrayFlag, String blanks) {
+    private void formatPropertiesToYaml(List<String> yamlLineList, List<yamlNode> yamlNodes, Boolean lastNodeArrayFlag, String blanks) {
         Integer beforeNodeIndex = null;
         String equalSign;
         for (yamlNode yamlNode : yamlNodes) {
@@ -645,7 +708,10 @@ public class YamlUtil {
             } else {
                 // 父节点为空，表示，当前为顶层
                 if (null == yamlNode.getParent()) {
-                    yamlLineList.add(blanks + getRemarkProject(yamlNode.getProjectRemark()));
+                    String remarkTem = getRemarkProject(yamlNode.getProjectRemark());
+                    if (!"".equals(remarkTem)) {
+                        yamlLineList.add(blanks + getRemarkProject(yamlNode.getProjectRemark()));
+                    }
                 }
 
                 // 自己节点为数组，则添加对应的注释
@@ -659,29 +725,29 @@ public class YamlUtil {
 
             if (yamlNode.getArrayFlag()) {
                 if (lastNodeArrayFlag) {
-                    formatPropertiesToyaml(yamlLineList, yamlNode.getValueList(), true, INDENT_BLANKS + INDENT_BLANKS + blanks);
+                    formatPropertiesToYaml(yamlLineList, yamlNode.getValueList(), true, INDENT_BLANKS + INDENT_BLANKS + blanks);
                 } else {
-                    formatPropertiesToyaml(yamlLineList, yamlNode.getValueList(), true, INDENT_BLANKS + blanks);
+                    formatPropertiesToYaml(yamlLineList, yamlNode.getValueList(), true, INDENT_BLANKS + blanks);
                 }
             } else {
                 if (lastNodeArrayFlag) {
-                    formatPropertiesToyaml(yamlLineList, yamlNode.getChildren(), false, INDENT_BLANKS + INDENT_BLANKS + blanks);
+                    formatPropertiesToYaml(yamlLineList, yamlNode.getChildren(), false, INDENT_BLANKS + INDENT_BLANKS + blanks);
                 } else {
-                    formatPropertiesToyaml(yamlLineList, yamlNode.getChildren(), false, INDENT_BLANKS + blanks);
+                    formatPropertiesToYaml(yamlLineList, yamlNode.getChildren(), false, INDENT_BLANKS + blanks);
                 }
             }
         }
     }
 
     @SuppressWarnings("rawtypes")
-    private void formatyamlToProperties(List<String> propertiesLineList, Map<String, String> remarkMap, Object object, String prefix) {
+    private void formatYamlToProperties(List<String> propertiesLineList, Map<String, String> remarkMap, Object object, String prefix) {
         if (null == object) {
             return;
         }
         if (object instanceof Map) {
             // 填充注释
             if (remarkMap.containsKey(prefix)) {
-                propertiesLineList.add("# " + remarkMap.get(prefix));
+                propertiesLineList.add(REMARK_PRE + remarkMap.get(prefix));
             }
 
             Map map = (Map) object;
@@ -692,20 +758,20 @@ public class YamlUtil {
                     value = "";
                 }
                 if (value instanceof Map) {
-                    formatyamlToProperties(propertiesLineList, remarkMap, value, prefixWithDOT(prefix) + key);
+                    formatYamlToProperties(propertiesLineList, remarkMap, value, prefixWithDOT(prefix) + key);
                 } else if (value instanceof Collection) {
                     Collection collection = (Collection) value;
                     if (!collection.isEmpty()) {
                         // 填充注释
                         if (remarkMap.containsKey(prefixWithDOT(prefix) + key)) {
-                            propertiesLineList.add("# " + remarkMap.get(prefixWithDOT(prefix) + key));
+                            propertiesLineList.add(REMARK_PRE + remarkMap.get(prefixWithDOT(prefix) + key));
                         }
 
                         Iterator<?> iterator = collection.iterator();
                         int index = 0;
                         while (iterator.hasNext()) {
                             Object valueObject = iterator.next();
-                            formatyamlToProperties(propertiesLineList, remarkMap, valueObject, prefixWithDOT(prefix) + key + "[" + index + "]");
+                            formatYamlToProperties(propertiesLineList, remarkMap, valueObject, prefixWithDOT(prefix) + key + "[" + index + "]");
                             index = index + 1;
                         }
                     }
@@ -715,14 +781,14 @@ public class YamlUtil {
                     valueStr = valueStr.replace("\n", "\\\n");
                     // 填充注释
                     if (remarkMap.containsKey(prefixWithDOT(prefix) + key)) {
-                        propertiesLineList.add("# " + remarkMap.get(prefixWithDOT(prefix) + key));
+                        propertiesLineList.add(REMARK_PRE + remarkMap.get(prefixWithDOT(prefix) + key));
                     }
 
                     propertiesLineList.add(prefixWithDOT(prefix) + key + SIGN_EQUAL + valueStr);
                 } else {
                     // 填充注释
                     if (remarkMap.containsKey(prefixWithDOT(prefix) + key)) {
-                        propertiesLineList.add("# " + remarkMap.get(prefixWithDOT(prefix) + key));
+                        propertiesLineList.add(REMARK_PRE + remarkMap.get(prefixWithDOT(prefix) + key));
                     }
 
                     propertiesLineList.add(prefixWithDOT(prefix) + key + SIGN_EQUAL + value);
@@ -733,35 +799,35 @@ public class YamlUtil {
             if (!collection.isEmpty()) {
                 // 填充注释
                 if (remarkMap.containsKey(prefix)) {
-                    propertiesLineList.add("# " + remarkMap.get(prefix));
+                    propertiesLineList.add(REMARK_PRE + remarkMap.get(prefix));
                 }
 
                 Iterator<?> iterator = collection.iterator();
                 int index = 0;
                 while (iterator.hasNext()) {
                     Object valueObject = iterator.next();
-                    formatyamlToProperties(propertiesLineList, remarkMap, valueObject, prefix + "[" + index + "]");
+                    formatYamlToProperties(propertiesLineList, remarkMap, valueObject, prefix + "[" + index + "]");
                     index = index + 1;
                 }
             }
         } else if (object.getClass().isArray()) {
             Object[] array = (Object[]) object;
             for (int index = 0; index < array.length; index++) {
-                formatyamlToProperties(propertiesLineList, remarkMap, array[index], prefix + "[" + index + "]");
+                formatYamlToProperties(propertiesLineList, remarkMap, array[index], prefix + "[" + index + "]");
             }
         } else if (object instanceof String){
             String valueObject = (String) object;
             valueObject = valueObject.replace("\n", "\\\n");
             // 填充注释
             if (remarkMap.containsKey(prefix)) {
-                propertiesLineList.add("# " + remarkMap.get(prefix));
+                propertiesLineList.add(REMARK_PRE + remarkMap.get(prefix));
             }
 
             propertiesLineList.add(prefix + SIGN_EQUAL + valueObject);
         } else {
             // 填充注释
             if (remarkMap.containsKey(prefix)) {
-                propertiesLineList.add("# " + remarkMap.get(prefix));
+                propertiesLineList.add(REMARK_PRE + remarkMap.get(prefix));
             }
 
             propertiesLineList.add(prefix + SIGN_EQUAL + object);
@@ -808,7 +874,7 @@ public class YamlUtil {
 
     private String getRemarkProject(String remark) {
         if (null != remark && !"".endsWith(remark) && remark.startsWith("#")) {
-            return "# " + remark.substring(1).trim();
+            return " # " + remark.substring(1).trim();
         } else {
             return "";
         }
