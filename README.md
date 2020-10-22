@@ -15,8 +15,9 @@
 * [12.身份证解析工具](#身份证解析工具)
 * [13.分布式全局id](#分布式全局id)
 * [14.jar包动态加载工具](#jar包动态加载工具)
-* [15.LocalDateTimeUtil工具](#LocalDateTimeUtil工具)
+* [15.布隆过滤器计算工具](#布隆过滤器计算工具)
 * [16.yaml与properties和json转换工具](#yaml与properties和json转换工具)
+* [17.LocalDateTimeUtil工具](#LocalDateTimeUtil工具)
 
 <a name="Zefy4"></a>
 <h2 id="一键式生成整个前后端工具">1.一键式生成整个前后端工具</h2>
@@ -951,4 +952,42 @@ public void ymlToPropertiesMultiLineTest() {
     //root:dell@123:10.30.30.35:22
     Assert.assertEquals(propertiesContent.trim(), YamlUtil.ymlToProperties(ymlContent).trim());
 }
+```
+
+<a name="aeNfY"></a>
+<h2 id="LocalDateTimeUtil工具">17.LocalDateTimeUtil工具</h2>
+<a name="kOjzS"></a>
+
+主要转换的有如下
+```text
+ 1.LocalDateTime ----> LocalDate
+ 2.LocalDateTime ----> Long
+ 3.LocalDateTime ----> Date
+ 4.LocalDateTime ----> String
+
+ 1.LocalDate ----> LocalDateTime
+ 2.LocalDate ----> Long
+ 3.LocalDate ----> Date
+ 4.LocalDate ----> String
+
+ 1.Date ----> LocalDateTime
+ 2.Date ----> LocalDate
+ 3.Date ----> Long
+ 4.Date ----> String
+
+ 1.Timestamp ----> LocalDateTime
+ 2.Timestamp ----> Long
+ 3.Timestamp ----> String
+ 4.Timestamp ----> LocalDate
+
+ 1.String ----> LocalDateTime
+ 2.String ----> LocalDate
+ 3.String ----> Date
+ 4.String ----> Timestamp
+ 5.String ----> LocalTime
+ 6.String ----> Time
+
+ 1.Long ----> Date
+ 2.Long ----> LocalDateTime
+ 3.Long ----> LocalDate
 ```
