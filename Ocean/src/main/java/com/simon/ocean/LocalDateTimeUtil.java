@@ -1,34 +1,51 @@
 package com.simon.ocean;
 
-import lombok.experimental.UtilityClass;
-
+import java.sql.Time;
+import java.sql.Timestamp;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 
 /**
  * @author shizi
  * @since 2020/9/9 8:58 下午
  */
-@UtilityClass
 public class LocalDateTimeUtil {
 
-    public final String yMdHmsS = "yyyy-MM-dd HH:mm:ss SSS";
-    public final String yMdHms = "yyyy-MM-dd HH:mm:ss";
-    public final String yMdHm = "yyyy-MM-dd HH:mm";
-    public final String yMdH = "yyyy-MM-dd HH";
-    public final String yMd = "yyyy-MM-dd";
-    public final String yM = "yyyy-MM";
-    public final String y = "yyyy";
+    public static final String yMdHmsSSS = "yyyy-MM-dd HH:mm:ss.SSS";
+    public static final String yMdHmsS = "yyyy-MM-dd HH:mm:ss.S";
+    public static final String yMdHms = "yyyy-MM-dd HH:mm:ss";
+    public static final String yMdHm = "yyyy-MM-dd HH:mm";
+    public static final String yMdH = "yyyy-MM-dd HH";
+    public static final String yMd = "yyyy-MM-dd";
+    public static final String yM = "yyyy-MM";
+    public static final String y = "yyyy";
 
-    private final Map<String, SimpleDateFormat> simpleDateFormat = new ConcurrentHashMap<>(7);
-    private final Map<String, DateTimeFormatter> localDateTimeFormat = new ConcurrentHashMap<>(7);
+    public static final String HmsSSSMore = "HH:mm:ss.SSSSSSSSS";
+    public static final String HmsSSS = "HH:mm:ss.SSS";
+    public static final String Hms = "HH:mm:ss";
+    public static final String Hm = "HH:mm";
+    public static final String H = "HH";
+
+    private static final Pattern yMdHmsSSSPattern = Pattern.compile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}.(\\d){3}$");
+    private static final Pattern yMdHmsSPattern = Pattern.compile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}.(\\d){1}$");
+    private static final Pattern yMdHmsPattern = Pattern.compile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}:(\\d){2}$");
+    private static final Pattern yMdHmPattern = Pattern.compile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}:(\\d){2}$");
+    private static final Pattern yMdHPattern = Pattern.compile("^(\\d){4}-(\\d){2}-(\\d){2} (\\d){2}$");
+    private static final Pattern yMdPattern = Pattern.compile("^(\\d){4}-(\\d){2}-(\\d){2}$");
+    private static final Pattern yMPattern = Pattern.compile("^(\\d){4}-(\\d){2}$");
+    private static final Pattern yPattern = Pattern.compile("^(\\d){4}$");
+
+    private static final Map<String, SimpleDateFormat> simpleDateFormat = new ConcurrentHashMap<>(7);
+    private static final Map<String, DateTimeFormatter> localDateTimeFormat = new ConcurrentHashMap<>(7);
 
     static {
-        simpleDateFormat.put(yMdHmsS, new SimpleDateFormat(yMdHmsS));
+        simpleDateFormat.put(yMdHmsSSS, new SimpleDateFormat(yMdHmsSSS));
         simpleDateFormat.put(yMdHms, new SimpleDateFormat(yMdHms));
         simpleDateFormat.put(yMdHm, new SimpleDateFormat(yMdHm));
         simpleDateFormat.put(yMdH, new SimpleDateFormat(yMdH));
@@ -36,7 +53,7 @@ public class LocalDateTimeUtil {
         simpleDateFormat.put(yM, new SimpleDateFormat(yM));
         simpleDateFormat.put(y, new SimpleDateFormat(y));
 
-        localDateTimeFormat.put(yMdHmsS, DateTimeFormatter.ofPattern(yMdHmsS));
+        localDateTimeFormat.put(yMdHmsSSS, DateTimeFormatter.ofPattern(yMdHmsSSS));
         localDateTimeFormat.put(yMdHms, DateTimeFormatter.ofPattern(yMdHms));
         localDateTimeFormat.put(yMdHm, DateTimeFormatter.ofPattern(yMdHm));
         localDateTimeFormat.put(yMdH, DateTimeFormatter.ofPattern(yMdH));
@@ -48,42 +65,43 @@ public class LocalDateTimeUtil {
     /**
      * LocalDateTime 转 LocalDate
      */
-    private LocalDate localDateTimeToLocalDate(LocalDateTime localDateTime) {
+    private static LocalDate localDateTimeToLocalDate(LocalDateTime localDateTime) {
         return localDateTime.toLocalDate();
     }
 
     /**
      * LocalDateTime 转 Long
      */
-    public Long localDateTimeToLong(LocalDateTime localDateTime) {
+    public static Long localDateTimeToLong(LocalDateTime localDateTime) {
         return localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**
      * LocalDateTime 转 Date
      */
-    public Date localDateTimeToDate(LocalDateTime localDateTime) {
+    public static Date localDateTimeToDate(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
      * LocalDateTime 转 String
      */
-    public String localDateTimeToString(LocalDateTime localDateTime) {
+    public static String localDateTimeToString(LocalDateTime localDateTime) {
         return localDateTime.format(localDateTimeFormat.get(yMdHms));
     }
 
+
     /**
-     * 根据指定的格式：LocalDateTime 转 String
+     * LocalDateTime 转 String
      */
-    public String localDateTimeToString(LocalDateTime localDateTime, String dateTimeFormat) {
+    public static String localDateTimeToString(LocalDateTime localDateTime, String dateTimeFormat) {
         return localDateTime.format(localDateTimeFormat.get(dateTimeFormat));
     }
 
     /**
-     * 根据指定的格式：LocalDateTime 转 String
+     * LocalDateTime 转 String
      */
-    public String localDateTimeToString(LocalDateTime localDateTime, DateTimeFormatter dateTimeFormatter) {
+    public static String localDateTimeToString(LocalDateTime localDateTime, DateTimeFormatter dateTimeFormatter) {
         return localDateTime.format(dateTimeFormatter);
     }
 
@@ -91,28 +109,28 @@ public class LocalDateTimeUtil {
     /**
      * LocalDate 转 LocalDateTime
      */
-    public LocalDateTime localDateToLocalDateTime(LocalDate localDate) {
+    public static LocalDateTime localDateToLocalDateTime(LocalDate localDate) {
         return LocalDateTime.of(localDate, LocalTime.parse("00:00:00"));
     }
 
     /**
      * LocalDate 转 Long
      */
-    public Long localDateToLong(LocalDate localDate) {
+    public static Long localDateToLong(LocalDate localDate) {
         return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant().toEpochMilli();
     }
 
     /**
      * LocalDate 转 Date
      */
-    public Date localDateToDate(LocalDate localDate) {
+    public static Date localDateToDate(LocalDate localDate) {
         return Date.from(localDate.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
     }
 
     /**
      * LocalDate 转 String
      */
-    public String localDateToString(LocalDate localDate) {
+    public static String localDateToString(LocalDate localDate) {
         return localDate.format(localDateTimeFormat.get(yMd));
     }
 
@@ -120,79 +138,190 @@ public class LocalDateTimeUtil {
     /**
      * Date 转 LocalDateTime
      */
-    public LocalDateTime dateToLocalDateTime(Date date) {
+    public static LocalDateTime dateToLocalDateTime(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault());
     }
 
     /**
      * Date 转 Long
      */
-    public Long dateToLong(Date date) {
+    public static Long dateToLong(Date date) {
         return date.getTime();
     }
 
     /**
      * Date 转 LocalDate
      */
-    public LocalDate dateToLocalDate(Date date) {
+    public static LocalDate dateToLocalDate(Date date) {
         return LocalDateTime.ofInstant(date.toInstant(), ZoneId.systemDefault()).toLocalDate();
     }
 
     /**
      * Date 转 String
      */
-    public String dateToString(Date date) {
+    public static String dateToString(Date date) {
         return simpleDateFormat.get(yMdHms).format(date);
     }
 
     /**
      * Date 转 String
      */
-    public String dateToString(Date date, SimpleDateFormat simpleDateFormat) {
+    public static String dateToString(Date date, SimpleDateFormat simpleDateFormat) {
         return simpleDateFormat.format(date);
     }
 
     /**
      * Date 转 String
      */
-    public String dateToString(Date date, String simpleDateFormatStr) {
+    public static String dateToString(Date date, String simpleDateFormatStr) {
         return simpleDateFormat.get(simpleDateFormatStr).format(date);
+    }
+
+
+    /**
+     * Timestamp 转 LocalDateTime
+     */
+    public static LocalDateTime timestampToLocalDateTime(Timestamp timestamp) {
+        return timestamp.toLocalDateTime();
+    }
+
+    /**
+     * Timestamp 转 Long
+     */
+    public static Long timestampToLong(Timestamp timestamp) {
+        return timestamp.getTime();
+    }
+
+    /**
+     * Timestamp 转 LocalDate
+     */
+    public static LocalDate timestampToLocalDate(Timestamp timestamp) {
+        return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault()).toLocalDate();
+    }
+
+    /**
+     * Timestamp 转 String
+     */
+    public static String timestampToString(Timestamp timestamp) {
+        return simpleDateFormat.get(yMdHmsSSS).format(timestamp);
+    }
+
+    /**
+     * Timestamp 转 String
+     */
+    public static String timestampToString(Timestamp timestamp, SimpleDateFormat simpleDateFormat) {
+        return simpleDateFormat.format(timestamp);
+    }
+
+    /**
+     * Timestamp 转 String
+     */
+    public static String timestampToString(Timestamp timestamp, String simpleDateFormatStr) {
+        return simpleDateFormat.get(simpleDateFormatStr).format(timestamp);
     }
 
 
     /**
      * String 转 LocalDateTime
      */
-    public LocalDateTime stringToLocalDateTime(String strDateTime) {
-        return LocalDateTime.parse(strDateTime, localDateTimeFormat.get(yMdHms));
+    public static LocalDateTime stringToLocalDateTime(String strDateTime) {
+        return LocalDateTime.parse(strDateTime, DateTimeFormatter.ofPattern(getTimeFormat(strDateTime)));
+    }
+
+    /**
+     * String 转 LocalDateTime
+     */
+    public static LocalDateTime stringToLocalDateTime(String strDateTime, String formatStr) {
+        return LocalDateTime.parse(strDateTime, DateTimeFormatter.ofPattern(formatStr));
     }
 
     /**
      * String 转 LocalDate
      */
-    public LocalDateTime stringToLocalDate(String strDateTime) {
-        return LocalDateTime.parse(strDateTime, localDateTimeFormat.get(yMd));
+    public static LocalDate stringToLocalDate(String strDateTime) {
+        return LocalDate.parse(strDateTime, localDateTimeFormat.get(yMd));
     }
 
     /**
      * String 转 Date
      */
-    public Date stringToDate(String strDateTime) {
-        return Date.from(LocalDateTime.parse(strDateTime, localDateTimeFormat.get(yMdHms)).atZone(ZoneId.systemDefault()).toInstant());
+    public static Date stringToDate(String strDateTime) {
+        try {
+            return simpleDateFormat.get(getTimeFormat(strDateTime)).parse(strDateTime);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
     }
 
+    /**
+     * String 转 Timestamp
+     */
+    public static Timestamp stringToTimestamp(String strDateTime) {
+        return Timestamp.valueOf(strDateTime);
+    }
+
+    /**
+     * String 转 LocalTime
+     */
+    public static LocalTime stringToLocalTime(String strDateTime, String datetimeFormat) {
+        return LocalTime.parse(strDateTime, DateTimeFormatter.ofPattern(datetimeFormat));
+    }
+
+    /**
+     * String 转 LocalTime
+     */
+    public static LocalTime stringToLocalTime(String strDateTime) {
+        return LocalTime.parse(strDateTime, DateTimeFormatter.ofPattern(HmsSSS));
+    }
+
+    /**
+     * String 转 Time
+     */
+    public static Time stringToTime(String strDateTime) {
+        return Time.valueOf(strDateTime);
+    }
 
     /**
      * Long 转 LocalDateTime
      */
-    public LocalDateTime longToLocalDateTime(Long timestamp) {
+    public static LocalDateTime longToLocalDateTime(Long timestamp) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp), ZoneId.systemDefault());
     }
 
     /**
      * Long 转 LocalDate
      */
-    public LocalDate longToLocalDate(Long timestamp) {
+    public static LocalDate longToLocalDate(Long timestamp) {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(timestamp),ZoneId.systemDefault()).toLocalDate();
+    }
+
+    private static String getTimeFormat(String strDateTime) {
+        if (null == strDateTime) {
+            throw new RuntimeException("获取时间格式错误, time =" + strDateTime);
+        }
+        String data;
+        data = strDateTime.trim();
+        if ("".equals(data) || "null".equals(data)){
+            throw new RuntimeException("获取时间格式错误, time =" + strDateTime);
+        }
+        String timeFormat = yMdHms;
+        if (yPattern.matcher(data).matches()) {
+            timeFormat = y;
+        } else if (yMPattern.matcher(data).matches()) {
+            timeFormat = yM;
+        } else if (yMdPattern.matcher(data).matches()) {
+            timeFormat = yMd;
+        } else if (yMdHPattern.matcher(data).matches()) {
+            timeFormat = yMdH;
+        } else if (yMdHmPattern.matcher(data).matches()) {
+            timeFormat = yMdHm;
+        } else if (yMdHmsPattern.matcher(data).matches()) {
+            timeFormat = yMdHms;
+        } else if (yMdHmsSPattern.matcher(data).matches()) {
+            timeFormat = yMdHmsS;
+        } else if (yMdHmsSSSPattern.matcher(data).matches()) {
+            timeFormat = yMdHmsSSS;
+        }
+        return timeFormat;
     }
 }
