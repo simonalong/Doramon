@@ -17,7 +17,7 @@ public enum ConfigValueTypeEnum {
     /**
      * yml配置
      */
-    YML("yml配置"),
+    YAML("yml配置"),
     /**
      * properties配置
      */
