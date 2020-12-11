@@ -226,13 +226,13 @@ public String parseWeeks(long time) {}
 Ocean
 <a name="avWjP"></a>
 #### 技术：
-类：StringTypeUtil
+类：JsonStrUtil
 <a name="urMJ2"></a>
 #### 说明：
-主要是将json格式化的那个压缩的进行有格式化的展示
+主要是将json格式化的那个压缩的进行展开，主要是用于一些页面格式没有json时候的展示
 
 ```java
-public String parseJson(String str) {}
+public String prettyJson(String str) {}
 ```
 
 <a name="8PwSJ"></a>
