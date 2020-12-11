@@ -30,7 +30,7 @@ public class StringTypeUtilTest {
         //     "d":"4",
         //     "e":"5"
         //}
-        show(StringTypeUtil.parseJson(JSON.toJSONString(dataMap)));
+        show(JsonStrUtils.prettyJson(JSON.toJSONString(dataMap)));
     }
 
     @Test

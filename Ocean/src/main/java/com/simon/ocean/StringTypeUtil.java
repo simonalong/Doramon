@@ -15,63 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 public class StringTypeUtil {
 
     /**
-     * 专门用于解析json对应的string到界面回车的显示，即反向解压json
-     */
-    public String parseJson(String str) {
-        StringBuilder stringBuilder = new StringBuilder();
-        boolean spaceFlag = false;
-        //[]这个括号内部的逗号不替换
-        boolean leftFlag = false;
-        char[] charList = str.toCharArray();
-        int leftCount = 0;
-        for (char c : charList) {
-            if (c == ',') {
-                if (leftFlag) {
-                    stringBuilder.append(c);
-                    continue;      //表示当前处于是数组中的逗号，这个时候不关心
-                }
-                stringBuilder.append(",\n");
-                if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCount));
-                }
-            } else if (c == '{') {
-                stringBuilder.append("\n");
-                if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCount));
-                }
-                spaceFlag = true;
-                stringBuilder.append("{\n");
-                leftCount++;
-                stringBuilder.append(addSpace(leftCount));
-            } else if (c == '}') {
-                leftCount--;
-                stringBuilder.append("\n");
-                if (spaceFlag) {
-                    stringBuilder.append(addSpace(leftCount));
-                }
-                stringBuilder.append("}");
-            } else if (c == '[') {
-                leftFlag = true;
-                stringBuilder.append(c);
-            } else if (c == ']') {
-                leftFlag = false;
-                stringBuilder.append(c);
-            } else {
-                stringBuilder.append(c);
-            }
-        }
-        return stringBuilder.toString();
-    }
-
-    private String addSpace(int count) {
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < count; i++) {
-            stringBuilder.append("     ");
-        }
-        return stringBuilder.toString();
-    }
-
-    /**
      * 数组toString的字符串转换过来
      */
     public List strToList(String string) {
