@@ -336,6 +336,119 @@ public class LocalDateTimeUtil {
         return LocalDateTime.ofInstant(Instant.ofEpochMilli(time),ZoneId.systemDefault()).toLocalDate();
     }
 
+    public static Date setYear(Date date, Integer year) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withYear(year));
+    }
+
+    public static Date setMonth(Date date, Integer month) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withMonth(month));
+    }
+
+    public static Date setDay(Date date, Integer day) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withDayOfMonth(day));
+    }
+
+    public static Date setHour(Date date, Integer hour) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withHour(hour));
+    }
+
+    public static Date setMinute(Date date, Integer minute) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withMinute(minute));
+    }
+
+    public static Date setSecond(Date date, Integer second) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withSecond(second));
+    }
+
+    public static Long setYear(Long time, Integer year) {
+        return localDateTimeToLong(longToLocalDateTime(time).withYear(year));
+    }
+
+    public static Long setMonth(Long time, Integer month) {
+        return localDateTimeToLong(longToLocalDateTime(time).withMonth(month));
+    }
+
+    public static Long setDay(Long time, Integer day) {
+        return localDateTimeToLong(longToLocalDateTime(time).withDayOfMonth(day));
+    }
+
+    public static Long setHour(Long time, Integer hour) {
+        return localDateTimeToLong(longToLocalDateTime(time).withHour(hour));
+    }
+
+    public static Long setMinute(Long time, Integer minute) {
+        return localDateTimeToLong(longToLocalDateTime(time).withMinute(minute));
+    }
+
+    public static Long setSecond(Long time, Integer second) {
+        return localDateTimeToLong(longToLocalDateTime(time).withSecond(second));
+    }
+
+
+    public static Date plusYears(Date date, Integer years) {
+        return localDateTimeToDate(dateToLocalDateTime(date).plusYears(years));
+    }
+
+    public static Date plusMonths(Date date, Integer months) {
+        return localDateTimeToDate(dateToLocalDateTime(date).plusMonths(months));
+    }
+
+    public static Date plusDays(Date date, Integer days) {
+        return localDateTimeToDate(dateToLocalDateTime(date).plusDays(days));
+    }
+
+    public static Date plusHours(Date date, Integer hours) {
+        return localDateTimeToDate(dateToLocalDateTime(date).plusHours(hours));
+    }
+
+    public static Date plusMinutes(Date date, Integer minutes) {
+        return localDateTimeToDate(dateToLocalDateTime(date).plusMinutes(minutes));
+    }
+
+    public static Date plusSeconds(Date date, Integer seconds) {
+        return localDateTimeToDate(dateToLocalDateTime(date).plusSeconds(seconds));
+    }
+
+    public static Long plusYears(Long time, Integer years) {
+        return localDateTimeToLong(longToLocalDateTime(time).plusYears(years));
+    }
+
+    public static Long plusMonths(Long time, Integer months) {
+        return localDateTimeToLong(longToLocalDateTime(time).plusMonths(months));
+    }
+
+    public static Long plusDays(Long time, Integer days) {
+        return localDateTimeToLong(longToLocalDateTime(time).plusDays(days));
+    }
+
+    public static Long plusHours(Long time, Integer hours) {
+        return localDateTimeToLong(longToLocalDateTime(time).plusHours(hours));
+    }
+
+    public static Long plusMinutes(Long time, Integer minutes) {
+        return localDateTimeToLong(longToLocalDateTime(time).plusMinutes(minutes));
+    }
+
+    public static Long plusSeconds(Long time, Integer seconds) {
+        return localDateTimeToLong(longToLocalDateTime(time).plusSeconds(seconds));
+    }
+
+    public static Date setDayStart(Date date) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withHour(0).withMinute(0).withSecond(0));
+    }
+
+    public static Long setDayStart(Long time) {
+        return localDateTimeToLong(longToLocalDateTime(time).withHour(0).withMinute(0).withSecond(0));
+    }
+
+    public static Date setDayEnd(Date date) {
+        return localDateTimeToDate(dateToLocalDateTime(date).withHour(23).withMinute(59).withSecond(59));
+    }
+
+    public static Long setDayEnd(Long time) {
+        return localDateTimeToLong(longToLocalDateTime(time).withHour(23).withMinute(59).withSecond(59));
+    }
+
     private static String getTimeFormat(String strDateTime) {
         if (null == strDateTime) {
             throw new RuntimeException("获取时间格式错误, time =" + strDateTime);
