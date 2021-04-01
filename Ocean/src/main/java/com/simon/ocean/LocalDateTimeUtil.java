@@ -1,4 +1,4 @@
-package com.simonalong.mikilin.util;
+package com.simon.ocean;
 
 
 import java.sql.Time;
