@@ -1,4 +1,5 @@
-package com.simon.ocean;
+package com.simonalong.mikilin.util;
+
 
 import java.sql.Time;
 import java.sql.Timestamp;
@@ -14,40 +15,35 @@ import java.util.regex.Pattern;
 /**
  * 时间格式的各种转换
  *
- * <p>
- *     <ul>
- *         1.LocalDateTime ----> LocalDate
- *         2.LocalDateTime ----> Long
- *         3.LocalDateTime ----> Date
- *         4.LocalDateTime ----> String
+ * <ul>
+ *     <li>1.1.LocalDateTime {@code ---->} LocalDate</li>
+ *     <li>1.2.LocalDateTime {@code ---->} Long</li>
+ *     <li>1.3.LocalDateTime {@code ---->} Date</li>
+ *     <li>1.4.LocalDateTime {@code ---->} String</li>
+ *     <li>2.1.LocalDate {@code ---->} LocalDateTime</li>
+ *     <li>2.2.LocalDate {@code ---->} Long</li>
+ *     <li>2.3.LocalDate {@code ---->} Date</li>
+ *     <li>2.4.LocalDate {@code ---->} String</li>
+ *     <li>3.1.Date {@code ---->} LocalDateTime</li>
+ *     <li>3.2.Date {@code ---->} LocalDate</li>
+ *     <li>3.3.Date {@code ---->} Long</li>
+ *     <li>3.4.Date {@code ---->} String</li>
+ *     <li>4.1.Timestamp {@code ---->} LocalDateTime</li>
+ *     <li>4.2.Timestamp {@code ---->} Long</li>
+ *     <li>4.3.Timestamp {@code ---->} String</li>
+ *     <li>4.4.Timestamp {@code ---->} LocalDate</li>
+ *     <li>5.1.String {@code ---->} LocalDateTime</li>
+ *     <li>5.2.String {@code ---->} LocalDate</li>
+ *     <li>5.3.String {@code ---->} Date</li>
+ *     <li>5.4.String {@code ---->} Timestamp</li>
+ *     <li>5.5.String {@code ---->} LocalTime</li>
+ *     <li>5.6.String {@code ---->} Time</li>
+ *     <li>6.1.Long {@code ---->} Date</li>
+ *     <li>6.2.Long {@code ---->} LocalDateTime</li>
+ *     <li>6.3.Long {@code ---->} LocalDate</li>
+ *     <li>6.4.Long {@code ---->} String</li>
+ * </ul>
  *
- *         1.LocalDate ----> LocalDateTime
- *         2.LocalDate ----> Long
- *         3.LocalDate ----> Date
- *         4.LocalDate ----> String
- *
- *         1.Date ----> LocalDateTime
- *         2.Date ----> LocalDate
- *         3.Date ----> Long
- *         4.Date ----> String
- *
- *         1.Timestamp ----> LocalDateTime
- *         2.Timestamp ----> Long
- *         3.Timestamp ----> String
- *         4.Timestamp ----> LocalDate
- *
- *         1.String ----> LocalDateTime
- *         2.String ----> LocalDate
- *         3.String ----> Date
- *         4.String ----> Timestamp
- *         5.String ----> LocalTime
- *         6.String ----> Time
- *
- *         1.Long ----> Date
- *         2.Long ----> LocalDateTime
- *         3.Long ----> LocalDate
- *         4.Long ----> String
- *     </ul>
  * @author shizi
  * @since 2020/9/9 8:58 下午
  */
@@ -61,7 +57,6 @@ public class LocalDateTimeUtil {
     public static final String yMd = "yyyy-MM-dd";
     public static final String yM = "yyyy-MM";
     public static final String y = "yyyy";
-    public static final String yyyyMMdd = "yyyyMMdd";
 
     public static final String HmsSSSMore = "HH:mm:ss.SSSSSSSSS";
     public static final String HmsSSS = "HH:mm:ss.SSS";
@@ -89,7 +84,6 @@ public class LocalDateTimeUtil {
         simpleDateFormat.put(yMd, new SimpleDateFormat(yMd));
         simpleDateFormat.put(yM, new SimpleDateFormat(yM));
         simpleDateFormat.put(y, new SimpleDateFormat(y));
-        simpleDateFormat.put(yyyyMMdd, new SimpleDateFormat(yyyyMMdd));
 
         localDateTimeFormat.put(yMdHmsSSS, DateTimeFormatter.ofPattern(yMdHmsSSS));
         localDateTimeFormat.put(yMdHms, DateTimeFormatter.ofPattern(yMdHms));
@@ -100,8 +94,12 @@ public class LocalDateTimeUtil {
         localDateTimeFormat.put(y, DateTimeFormatter.ofPattern(y));
     }
 
+
     /**
      * LocalDateTime 转 LocalDate
+     *
+     * @param localDateTime 待转换时间
+     * @return 转换后的时间
      */
     private static LocalDate localDateTimeToLocalDate(LocalDateTime localDateTime) {
         if (null == localDateTime) {
@@ -113,8 +111,8 @@ public class LocalDateTimeUtil {
     /**
      * LocalDateTime 转 Long
      *
-     * @param localDateTime 时间
-     * @return 转换后的数据
+     * @param localDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static Long localDateTimeToLong(LocalDateTime localDateTime) {
         if (null == localDateTime) {
@@ -126,8 +124,8 @@ public class LocalDateTimeUtil {
     /**
      * LocalDateTime 转 Date
      *
-     * @param localDateTime 时间
-     * @return 转换后的Date类型数据
+     * @param localDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static Date localDateTimeToDate(LocalDateTime localDateTime) {
         if (null == localDateTime) {
@@ -139,7 +137,7 @@ public class LocalDateTimeUtil {
     /**
      * LocalDateTime 转 String
      *
-     * @param localDateTime 时间
+     * @param localDateTime 待转换时间
      * @return 转换后的时间
      */
     public static String localDateTimeToString(LocalDateTime localDateTime) {
@@ -149,15 +147,16 @@ public class LocalDateTimeUtil {
         return localDateTime.format(localDateTimeFormat.get(yMdHms));
     }
 
+
     /**
      * LocalDateTime 转 String
      *
-     * @param localDateTime  时间
-     * @param dateTimeFormat 时间格式
+     * @param localDateTime  待转换时间
+     * @param dateTimeFormat 时间转换格式，建议使用{@link LocalDateTimeUtil#yMdHmsSSS}或者{@link LocalDateTimeUtil#yMdHms}等字段
      * @return 转换后的时间
      */
     public static String localDateTimeToString(LocalDateTime localDateTime, String dateTimeFormat) {
-        if (null == localDateTime) {
+        if (null == localDateTime || null == dateTimeFormat) {
             return null;
         }
         return localDateTime.format(localDateTimeFormat.get(dateTimeFormat));
@@ -166,8 +165,8 @@ public class LocalDateTimeUtil {
     /**
      * LocalDateTime 转 String
      *
-     * @param localDateTime     时间
-     * @param dateTimeFormatter 时间格式
+     * @param localDateTime     待转换时间
+     * @param dateTimeFormatter 时间转换格式器
      * @return 转换后的时间
      */
     public static String localDateTimeToString(LocalDateTime localDateTime, DateTimeFormatter dateTimeFormatter) {
@@ -177,10 +176,11 @@ public class LocalDateTimeUtil {
         return localDateTime.format(dateTimeFormatter);
     }
 
+
     /**
      * LocalDate 转 LocalDateTime
      *
-     * @param localDate 时间
+     * @param localDate 待转换时间
      * @return 转换后的时间
      */
     public static LocalDateTime localDateToLocalDateTime(LocalDate localDate) {
@@ -193,7 +193,7 @@ public class LocalDateTimeUtil {
     /**
      * LocalDate 转 Long
      *
-     * @param localDate 时间
+     * @param localDate 待转换时间
      * @return 转换后的时间
      */
     public static Long localDateToLong(LocalDate localDate) {
@@ -206,7 +206,7 @@ public class LocalDateTimeUtil {
     /**
      * LocalDate 转 Date
      *
-     * @param localDate 时间
+     * @param localDate 待转换时间
      * @return 转换后的时间
      */
     public static Date localDateToDate(LocalDate localDate) {
@@ -219,7 +219,7 @@ public class LocalDateTimeUtil {
     /**
      * LocalDate 转 String
      *
-     * @param localDate 时间
+     * @param localDate 待转换时间
      * @return 转换后的时间
      */
     public static String localDateToString(LocalDate localDate) {
@@ -230,9 +230,22 @@ public class LocalDateTimeUtil {
     }
 
     /**
+     * LocalDate 转 String
+     *
+     * @param localTime 待转换时间
+     * @return 转换后的时间
+     */
+    public static String localTimeToString(LocalTime localTime) {
+        if (null == localTime) {
+            return null;
+        }
+        return localTime.format(localDateTimeFormat.get(HmsSSS));
+    }
+
+    /**
      * Date 转 LocalDateTime
      *
-     * @param date 时间
+     * @param date 待转换时间
      * @return 转换后的时间
      */
     public static LocalDateTime dateToLocalDateTime(Date date) {
@@ -245,7 +258,7 @@ public class LocalDateTimeUtil {
     /**
      * Date 转 Long
      *
-     * @param date 时间
+     * @param date 待转换时间
      * @return 转换后的时间
      */
     public static Long dateToLong(Date date) {
@@ -258,7 +271,7 @@ public class LocalDateTimeUtil {
     /**
      * Date 转 LocalDate
      *
-     * @param date 时间
+     * @param date 待转换时间
      * @return 转换后的时间
      */
     public static LocalDate dateToLocalDate(Date date) {
@@ -271,8 +284,8 @@ public class LocalDateTimeUtil {
     /**
      * Date 转 String
      *
-     * @param date 日期
-     * @return 转换后的字符串
+     * @param date 待转换时间
+     * @return 转换后的时间
      */
     public static String dateToString(Date date) {
         if (null == date) {
@@ -284,9 +297,9 @@ public class LocalDateTimeUtil {
     /**
      * Date 转 String
      *
-     * @param date             日期
-     * @param simpleDateFormat 日期格式
-     * @return 转换后的字符串
+     * @param date             待转换时间
+     * @param simpleDateFormat 基本的格式转换器
+     * @return 转换后的时间
      */
     public static String dateToString(Date date, SimpleDateFormat simpleDateFormat) {
         if (null == date || null == simpleDateFormat) {
@@ -298,21 +311,22 @@ public class LocalDateTimeUtil {
     /**
      * Date 转 String
      *
-     * @param date                日期
-     * @param simpleDateFormatStr 日期转换格式
-     * @return 转换后的日期字符串
+     * @param date                待转换时间
+     * @param simpleDateFormatStr 时间转换格式，建议使用{@link LocalDateTimeUtil#yMdHmsSSS}或者{@link LocalDateTimeUtil#yMdHms}等字段
+     * @return 转换后的时间
      */
     public static String dateToString(Date date, String simpleDateFormatStr) {
-        if (null == date || null == simpleDateFormatStr || "".equals(simpleDateFormatStr)) {
+        if (null == date || null == simpleDateFormatStr) {
             return null;
         }
         return simpleDateFormat.get(simpleDateFormatStr).format(date);
     }
 
+
     /**
      * Timestamp 转 LocalDateTime
      *
-     * @param timestamp 日期
+     * @param timestamp 待转换时间
      * @return 转换后的时间
      */
     public static LocalDateTime timestampToLocalDateTime(Timestamp timestamp) {
@@ -325,7 +339,7 @@ public class LocalDateTimeUtil {
     /**
      * Timestamp 转 Long
      *
-     * @param timestamp 时间格式
+     * @param timestamp 待转换时间
      * @return 转换后的时间
      */
     public static Long timestampToLong(Timestamp timestamp) {
@@ -338,7 +352,7 @@ public class LocalDateTimeUtil {
     /**
      * Timestamp 转 LocalDate
      *
-     * @param timestamp 时间
+     * @param timestamp 待转换时间
      * @return 转换后的时间
      */
     public static LocalDate timestampToLocalDate(Timestamp timestamp) {
@@ -348,12 +362,11 @@ public class LocalDateTimeUtil {
         return LocalDateTime.ofInstant(timestamp.toInstant(), ZoneId.systemDefault()).toLocalDate();
     }
 
-
     /**
      * Timestamp 转 String
      *
-     * @param timestamp 时间
-     * @return 转换后的字符串
+     * @param timestamp 待转换时间
+     * @return 转换后的时间
      */
     public static String timestampToString(Timestamp timestamp) {
         if (null == timestamp) {
@@ -365,9 +378,9 @@ public class LocalDateTimeUtil {
     /**
      * Timestamp 转 String
      *
-     * @param timestamp        时间
-     * @param simpleDateFormat 时间格式
-     * @return 转换后的时间字符串
+     * @param timestamp        待转换时间
+     * @param simpleDateFormat 简单的时间转换格式
+     * @return 转换后的时间
      */
     public static String timestampToString(Timestamp timestamp, SimpleDateFormat simpleDateFormat) {
         if (null == timestamp || null == simpleDateFormat) {
@@ -379,25 +392,26 @@ public class LocalDateTimeUtil {
     /**
      * Timestamp 转 String
      *
-     * @param timestamp           时间
-     * @param simpleDateFormatStr 时间转换格式
-     * @return 转换后的时间字符串
+     * @param timestamp           待转换时间
+     * @param simpleDateFormatStr 时间转换格式，建议使用{@link LocalDateTimeUtil#yMdHmsSSS}或者{@link LocalDateTimeUtil#yMdHms}等字段
+     * @return 转换后的时间
      */
     public static String timestampToString(Timestamp timestamp, String simpleDateFormatStr) {
-        if (null == timestamp || null == simpleDateFormatStr || "".equals(simpleDateFormatStr)) {
+        if (null == timestamp || null == simpleDateFormatStr) {
             return null;
         }
         return simpleDateFormat.get(simpleDateFormatStr).format(timestamp);
     }
 
+
     /**
      * String 转 LocalDateTime
      *
-     * @param strDateTime 时间字符串
-     * @return 转换后的日期
+     * @param strDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static LocalDateTime stringToLocalDateTime(String strDateTime) {
-        if (null == strDateTime || "".equals(strDateTime)) {
+        if (null == strDateTime) {
             return null;
         }
         return LocalDateTime.parse(strDateTime, DateTimeFormatter.ofPattern(getTimeFormat(strDateTime)));
@@ -406,12 +420,12 @@ public class LocalDateTimeUtil {
     /**
      * String 转 LocalDateTime
      *
-     * @param strDateTime 字符串类型的时间
-     * @param formatStr   时间转换格式
-     * @return 时间
+     * @param strDateTime 待转换时间
+     * @param formatStr   时间格式
+     * @return 转换后的时间
      */
     public static LocalDateTime stringToLocalDateTime(String strDateTime, String formatStr) {
-        if (null == strDateTime || "".equals(strDateTime) || null == formatStr || "".equals(formatStr)) {
+        if (null == strDateTime || null == formatStr) {
             return null;
         }
         return LocalDateTime.parse(strDateTime, DateTimeFormatter.ofPattern(formatStr));
@@ -420,11 +434,11 @@ public class LocalDateTimeUtil {
     /**
      * String 转 LocalDate
      *
-     * @param strDateTime 字符串类型的时间
-     * @return 时间
+     * @param strDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static LocalDate stringToLocalDate(String strDateTime) {
-        if (null == strDateTime || "".equals(strDateTime)) {
+        if (null == strDateTime) {
             return null;
         }
         return LocalDate.parse(strDateTime, localDateTimeFormat.get(yMd));
@@ -433,11 +447,11 @@ public class LocalDateTimeUtil {
     /**
      * String 转 Date
      *
-     * @param strDateTime 字符串类型的时间
-     * @return 日期
+     * @param strDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static Date stringToDate(String strDateTime) {
-        if (null == strDateTime || "".equals(strDateTime)) {
+        if (null == strDateTime) {
             return null;
         }
         try {
@@ -450,11 +464,11 @@ public class LocalDateTimeUtil {
     /**
      * String 转 Timestamp
      *
-     * @param strDateTime 字符串类型的时间
-     * @return 日期
+     * @param strDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static Timestamp stringToTimestamp(String strDateTime) {
-        if (null == strDateTime || "".equals(strDateTime)) {
+        if (null == strDateTime) {
             return null;
         }
         return Timestamp.valueOf(strDateTime);
@@ -463,12 +477,12 @@ public class LocalDateTimeUtil {
     /**
      * String 转 LocalTime
      *
-     * @param strDateTime    字符串类型的时间
-     * @param datetimeFormat 日期转化格式
-     * @return 日期
+     * @param strDateTime    待转换时间
+     * @param datetimeFormat 时间格式
+     * @return 转换后的时间
      */
     public static LocalTime stringToLocalTime(String strDateTime, String datetimeFormat) {
-        if (null == strDateTime || "".equals(strDateTime) || null == datetimeFormat || "".equals(datetimeFormat)) {
+        if (null == strDateTime || null == datetimeFormat) {
             return null;
         }
         return LocalTime.parse(strDateTime, DateTimeFormatter.ofPattern(datetimeFormat));
@@ -477,11 +491,11 @@ public class LocalDateTimeUtil {
     /**
      * String 转 LocalTime
      *
-     * @param strDateTime 字符串类型的时间
-     * @return 日期
+     * @param strDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static LocalTime stringToLocalTime(String strDateTime) {
-        if (null == strDateTime || "".equals(strDateTime)) {
+        if (null == strDateTime) {
             return null;
         }
         return LocalTime.parse(strDateTime, DateTimeFormatter.ofPattern(HmsSSS));
@@ -490,11 +504,11 @@ public class LocalDateTimeUtil {
     /**
      * String 转 Time
      *
-     * @param strDateTime 字符串类型的时间
-     * @return 时间
+     * @param strDateTime 待转换时间
+     * @return 转换后的时间
      */
     public static Time stringToTime(String strDateTime) {
-        if (null == strDateTime || "".equals(strDateTime)) {
+        if (null == strDateTime) {
             return null;
         }
         return Time.valueOf(strDateTime);
@@ -503,8 +517,8 @@ public class LocalDateTimeUtil {
     /**
      * Long 转 Date
      *
-     * @param time 时间对应的long类型
-     * @return 日期
+     * @param time 待转换时间
+     * @return 转换后的时间
      */
     public static Date longToDate(Long time) {
         if (null == time) {
@@ -514,49 +528,10 @@ public class LocalDateTimeUtil {
     }
 
     /**
-     * Long 转 java.sql.Date
-     *
-     * @param time long类型的时间
-     * @return 日期
-     */
-    public static java.sql.Date longToSqlDate(Long time) {
-        if (null == time) {
-            return null;
-        }
-        return new java.sql.Date(time);
-    }
-
-    /**
-     * Long 转 java.sql.Time
-     *
-     * @param time long类型的时间
-     * @return 日期
-     */
-    public static java.sql.Time longToTime(Long time) {
-        if (null == time) {
-            return null;
-        }
-        return new java.sql.Time(time);
-    }
-
-    /**
-     * Long 转 java.sql.Timestamp
-     *
-     * @param time long类型的时间
-     * @return 日期
-     */
-    public static Timestamp longToTimestamp(Long time) {
-        if (null == time) {
-            return null;
-        }
-        return new java.sql.Timestamp(time);
-    }
-
-    /**
      * Long 转 LocalDateTime
      *
-     * @param time long类型的时间
-     * @return 日期
+     * @param time 待转换时间
+     * @return 转换后的时间
      */
     public static LocalDateTime longToLocalDateTime(Long time) {
         if (null == time) {
@@ -568,8 +543,8 @@ public class LocalDateTimeUtil {
     /**
      * Long 转 LocalDate
      *
-     * @param time long类型的时间
-     * @return 日期
+     * @param time 待转换时间
+     * @return 转换后的时间
      */
     public static LocalDate longToLocalDate(Long time) {
         if (null == time) {
@@ -581,8 +556,8 @@ public class LocalDateTimeUtil {
     /**
      * Long 转 String
      *
-     * @param time long类型的时间
-     * @return 时间字符串
+     * @param time 待转换时间
+     * @return 转换后的时间
      */
     public static String longToString(Long time) {
         if (null == time) {
@@ -594,57 +569,132 @@ public class LocalDateTimeUtil {
     /**
      * Long 转 String
      *
-     * @param time      long类型的时间
-     * @param formatKey 时间格式key
-     * @return 时间字符串
+     * @param time      待转换时间
+     * @param formatKey 时间转换格式，建议使用{@link LocalDateTimeUtil#yMdHmsSSS}或者{@link LocalDateTimeUtil#yMdHms}等字段
+     * @return 转换后的时间
      */
     public static String longToString(Long time, String formatKey) {
-        if (null == time || null == formatKey || "".equals(formatKey)) {
+        if (null == time || null == formatKey) {
             return null;
         }
         return simpleDateFormat.get(formatKey).format(new Date(time));
     }
 
-    public static Date setYear(Date date, Integer year) {
-        if (null == date || null == year) {
+
+    public static Date setTime(Date date, Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second) {
+        if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withYear(year));
+
+        Integer yearCopy = year;
+        if (null == year) {
+            yearCopy = 0;
+        }
+
+        Integer monthCopy = month;
+        if (null == month) {
+            monthCopy = 0;
+        }
+
+        Integer dayCopy = day;
+        if (null == day) {
+            dayCopy = 0;
+        }
+
+        Integer hourCopy = hour;
+        if (null == hour) {
+            hourCopy = 0;
+        }
+
+        Integer minuteCopy = minute;
+        if (null == minute) {
+            minuteCopy = 0;
+        }
+
+        Integer secondCopy = second;
+        if (null == second) {
+            secondCopy = 0;
+        }
+        return localDateTimeToDate(
+            dateToLocalDateTime(date).withYear(yearCopy).withMonth(monthCopy).withDayOfMonth(dayCopy).withHour(hourCopy).withMinute(minuteCopy).withSecond(secondCopy));
+    }
+
+    public static Date setYear(Date date, Integer year) {
+        if (null == date) {
+            return null;
+        }
+
+        Integer yearCopy = year;
+        if (null == year) {
+            yearCopy = 0;
+        }
+        return localDateTimeToDate(dateToLocalDateTime(date).withYear(yearCopy));
     }
 
     public static Date setMonth(Date date, Integer month) {
-        if (null == date || null == month) {
+        if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withMonth(month));
+        Integer monthCopy = month;
+        if (null == month) {
+            monthCopy = 0;
+        }
+        return localDateTimeToDate(dateToLocalDateTime(date).withMonth(monthCopy));
     }
 
     public static Date setDay(Date date, Integer day) {
-        if (null == date || null == day) {
+        if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withDayOfMonth(day));
+        Integer dayCopy = day;
+        if (null == day) {
+            dayCopy = 0;
+        }
+        return localDateTimeToDate(dateToLocalDateTime(date).withDayOfMonth(dayCopy));
     }
 
     public static Date setHour(Date date, Integer hour) {
-        if (null == date || null == hour) {
+        if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withHour(hour));
+
+        Integer hourCopy = hour;
+        if (null == hour) {
+            hourCopy = 0;
+        }
+        return localDateTimeToDate(dateToLocalDateTime(date).withHour(hourCopy));
     }
 
     public static Date setMinute(Date date, Integer minute) {
-        if (null == date || null == minute) {
+        if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withMinute(minute));
+
+        Integer minuteCopy = minute;
+        if (null == minute) {
+            minuteCopy = 0;
+        }
+
+        return localDateTimeToDate(dateToLocalDateTime(date).withMinute(minuteCopy));
     }
 
     public static Date setSecond(Date date, Integer second) {
-        if (null == date || null == second) {
+        if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withSecond(second));
+
+        Integer secondCopy = second;
+        if (null == second) {
+            secondCopy = 0;
+        }
+        return localDateTimeToDate(dateToLocalDateTime(date).withSecond(secondCopy));
+    }
+
+    public static Long setTime(Long time, Integer year, Integer month, Integer day, Integer hour, Integer minute, Integer second) {
+        if (null == time || null == year || null == month || null == day || null == hour || null == minute || null == second) {
+            return null;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).withYear(year).withMonth(month).withDayOfMonth(day).withHour(hour).withMinute(minute).withSecond(second));
     }
 
     public static Long setYear(Long time, Integer year) {
@@ -689,22 +739,61 @@ public class LocalDateTimeUtil {
         return localDateTimeToLong(longToLocalDateTime(time).withSecond(second));
     }
 
+    public static Date plusTime(Date date, Integer years, Integer months, Integer days, Integer hours, Integer minutes, Integer seconds) {
+        if (null == date) {
+            return null;
+        }
+
+        Integer yearsCopy = years;
+        if (null == years) {
+            yearsCopy = 0;
+        }
+
+        Integer monthsCopy = months;
+        if (null == months) {
+            monthsCopy = 0;
+        }
+
+        Integer daysCopy = days;
+        if (null == days) {
+            daysCopy = 0;
+        }
+
+        Integer hoursCopy = hours;
+        if (null == hours) {
+            hoursCopy = 0;
+        }
+
+        Integer minutesCopy = minutes;
+        if (null == minutes) {
+            minutesCopy = 0;
+        }
+
+        Integer secondsCopy = seconds;
+        if (null == seconds) {
+            secondsCopy = 0;
+        }
+        return localDateTimeToDate(
+            dateToLocalDateTime(date).plusYears(yearsCopy).plusMonths(monthsCopy).plusDays(daysCopy).plusHours(hoursCopy).plusMinutes(minutesCopy).plusSeconds(secondsCopy));
+    }
 
     public static Date plusYears(Date date, Integer years) {
         if (null == date) {
             return null;
         }
-        Integer yearCopy = years;
+
+        Integer yearsCopy = years;
         if (null == years) {
-            yearCopy = 0;
+            yearsCopy = 0;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).plusYears(yearCopy));
+        return localDateTimeToDate(dateToLocalDateTime(date).plusYears(yearsCopy));
     }
 
     public static Date plusMonths(Date date, Integer months) {
         if (null == date) {
             return null;
         }
+
         Integer monthsCopy = months;
         if (null == months) {
             monthsCopy = 0;
@@ -716,6 +805,7 @@ public class LocalDateTimeUtil {
         if (null == date) {
             return null;
         }
+
         Integer daysCopy = days;
         if (null == days) {
             daysCopy = 0;
@@ -727,6 +817,7 @@ public class LocalDateTimeUtil {
         if (null == date) {
             return null;
         }
+
         Integer hoursCopy = hours;
         if (null == hours) {
             hoursCopy = 0;
@@ -738,6 +829,7 @@ public class LocalDateTimeUtil {
         if (null == date) {
             return null;
         }
+
         Integer minutesCopy = minutes;
         if (null == minutes) {
             minutesCopy = 0;
@@ -749,6 +841,7 @@ public class LocalDateTimeUtil {
         if (null == date) {
             return null;
         }
+
         Integer secondsCopy = seconds;
         if (null == seconds) {
             secondsCopy = 0;
@@ -756,46 +849,114 @@ public class LocalDateTimeUtil {
         return localDateTimeToDate(dateToLocalDateTime(date).plusSeconds(secondsCopy));
     }
 
-    public static Long plusYears(Long time, Integer years) {
-        if (null == time || null == years) {
+    public static Long plusTime(Long time, Integer years, Integer months, Integer days, Integer hours, Integer minutes, Integer seconds) {
+        if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).plusYears(years));
+
+        Integer yearsCopy = years;
+        if (null == years) {
+            yearsCopy = 0;
+        }
+
+        Integer monthsCopy = months;
+        if (null == months) {
+            monthsCopy = 0;
+        }
+
+        Integer daysCopy = days;
+        if (null == days) {
+            daysCopy = 0;
+        }
+
+        Integer hoursCopy = hours;
+        if (null == hours) {
+            hoursCopy = 0;
+        }
+
+        Integer minutesCopy = minutes;
+        if (null == minutes) {
+            minutesCopy = 0;
+        }
+
+        Integer secondsCopy = seconds;
+        if (null == seconds) {
+            secondsCopy = 0;
+        }
+        return localDateTimeToLong(
+            longToLocalDateTime(time).plusYears(yearsCopy).plusMonths(monthsCopy).plusDays(daysCopy).plusHours(hoursCopy).plusMinutes(minutesCopy).plusSeconds(secondsCopy));
+    }
+
+    public static Long plusYears(Long time, Integer years) {
+        if (null == time) {
+            return null;
+        }
+
+        Integer yearsCopy = years;
+        if (null == years) {
+            yearsCopy = 0;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).plusYears(yearsCopy));
     }
 
     public static Long plusMonths(Long time, Integer months) {
-        if (null == time || null == months) {
+        if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).plusMonths(months));
+
+        Integer monthsCopy = months;
+        if (null == months) {
+            monthsCopy = 0;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).plusMonths(monthsCopy));
     }
 
     public static Long plusDays(Long time, Integer days) {
-        if (null == time || null == days) {
+        if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).plusDays(days));
+
+        Integer daysCopy = days;
+        if (null == days) {
+            daysCopy = 0;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).plusDays(daysCopy));
     }
 
     public static Long plusHours(Long time, Integer hours) {
-        if (null == time || null == hours) {
+        if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).plusHours(hours));
+
+        Integer hoursCopy = hours;
+        if (null == hours) {
+            hoursCopy = 0;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).plusHours(hoursCopy));
     }
 
     public static Long plusMinutes(Long time, Integer minutes) {
-        if (null == time || null == minutes) {
+        if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).plusMinutes(minutes));
+
+        Integer minutesCopy = minutes;
+        if (null == minutes) {
+            minutesCopy = 0;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).plusMinutes(minutesCopy));
     }
 
     public static Long plusSeconds(Long time, Integer seconds) {
-        if (null == time || null == seconds) {
+        if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).plusSeconds(seconds));
+
+        Integer secondsCopy = seconds;
+        if (null == seconds) {
+            secondsCopy = 0;
+        }
+        return localDateTimeToLong(longToLocalDateTime(time).plusSeconds(secondsCopy));
     }
 
     public static Date setDayStart(Date date) {
