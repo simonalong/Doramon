@@ -358,6 +358,34 @@ public class YamlUtil {
         });
     }
 
+    public Properties yamlToPropertiesValue(String content) {
+        if (isEmpty(content)) {
+            return null;
+        }
+        return cacheCompute("yamlToProperties", content, () -> {
+            try {
+                if (!content.contains(":") && !content.contains("-")) {
+                    return null;
+                }
+
+                if (content.trim().startsWith("-")) {
+                    return null;
+                }
+
+                Properties properties = new Properties();
+                Map<String, String> remarkMap = new LinkedHashMap<>();
+                Map<String, Object> valueMap = yamlToMap(content);
+
+                // 读取yaml的注释
+                yamlToRemarkMap(remarkMap, Yaml.createYamlInput(content).readYamlMapping(), "");
+                formatYamlToPropertiesValue(properties, remarkMap, valueMap, "");
+                return properties;
+            } catch (Throwable e) {
+                throw new ValueChangeException(e);
+            }
+        });
+    }
+
     /**
      * properties 转换到 yaml
      *
@@ -1178,6 +1206,66 @@ public class YamlUtil {
                     formatPropertiesToYaml(yamlLineList, YamlNode.getChildren(), false, INDENT_BLANKS + blanks);
                 }
             }
+        }
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void formatYamlToPropertiesValue(Properties properties, Map<String, String> remarkMap, Object object, String prefix) {
+        if (null == object) {
+            return;
+        }
+        if (object instanceof Map) {
+            Map map = (Map) object;
+            Set<?> set = map.keySet();
+            for (Object key : set) {
+                Object value = map.get(key);
+                if (null == value) {
+                    value = "";
+                }
+                if (value instanceof Map) {
+                    formatYamlToPropertiesValue(properties, remarkMap, value, prefixWithDOT(prefix) + key);
+                } else if (value instanceof Collection) {
+                    Collection collection = (Collection) value;
+                    if (!collection.isEmpty()) {
+                        Iterator<?> iterator = collection.iterator();
+                        int index = 0;
+                        while (iterator.hasNext()) {
+                            Object valueObject = iterator.next();
+                            formatYamlToPropertiesValue(properties, remarkMap, valueObject, prefixWithDOT(prefix) + key + "[" + index + "]");
+                            index = index + 1;
+                        }
+                    }
+                } else if (value instanceof String) {
+                    String valueStr = (String) value;
+                    valueStr = valueStr.trim();
+                    valueStr = valueStr.replace("\n", "\\\n");
+                    properties.put(prefixWithDOT(prefix) + key, valueStr);
+                } else {
+                    properties.put(prefixWithDOT(prefix) + key, value);
+                }
+            }
+        } else if (object instanceof Collection) {
+            Collection collection = (Collection) object;
+            if (!collection.isEmpty()) {
+                Iterator<?> iterator = collection.iterator();
+                int index = 0;
+                while (iterator.hasNext()) {
+                    Object valueObject = iterator.next();
+                    formatYamlToPropertiesValue(properties, remarkMap, valueObject, prefix + "[" + index + "]");
+                    index = index + 1;
+                }
+            }
+        } else if (object.getClass().isArray()) {
+            Object[] array = (Object[]) object;
+            for (int index = 0; index < array.length; index++) {
+                formatYamlToPropertiesValue(properties, remarkMap, array[index], prefix + "[" + index + "]");
+            }
+        } else if (object instanceof String) {
+            String valueObject = (String) object;
+            valueObject = valueObject.replace("\n", "\\\n");
+            properties.put(prefix, valueObject);
+        } else {
+            properties.put(prefix, object);
         }
     }
 
