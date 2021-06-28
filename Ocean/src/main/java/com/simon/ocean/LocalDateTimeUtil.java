@@ -963,14 +963,14 @@ public class LocalDateTimeUtil {
         if (null == date) {
             return null;
         }
-        return localDateTimeToDate(dateToLocalDateTime(date).withHour(0).withMinute(0).withSecond(0));
+        return localDateTimeToDate(dateToLocalDateTime(date).withHour(0).withMinute(0).withSecond(0).withNano(0));
     }
 
     public static Long setDayStart(Long time) {
         if (null == time) {
             return null;
         }
-        return localDateTimeToLong(longToLocalDateTime(time).withHour(0).withMinute(0).withSecond(0));
+        return localDateTimeToLong(longToLocalDateTime(time).withHour(0).withMinute(0).withSecond(0).withNano(0));
     }
 
     public static Date setDayEnd(Date date) {
