@@ -18,6 +18,7 @@
 * [15.布隆过滤器计算工具](#布隆过滤器计算工具)
 * [16.yaml与properties和json转换工具](#yaml与properties和json转换工具)
 * [17.LocalDateTimeUtil工具](#LocalDateTimeUtil工具)
+* [18.IdCardValidate身份证号校验工具](#IdCardValidate身份证号校验工具)
 
 <a name="Zefy4"></a>
 <h2 id="一键式生成整个前后端工具">1.一键式生成整个前后端工具</h2>
@@ -991,3 +992,7 @@ public void ymlToPropertiesMultiLineTest() {
  2.Long ----> LocalDateTime
  3.Long ----> LocalDate
 ```
+<a name="aeNfY"></a>
+<h2 id="IdCardValidate身份证号校验工具">18.IdCardValidate身份证号校验工具</h2>
+<a name="kOjzS"></a>
+该工具采用非常严格的身份证号规则
