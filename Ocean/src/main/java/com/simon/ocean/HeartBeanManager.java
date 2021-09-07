@@ -1,0 +1,98 @@
+package com.simon.ocean;
+
+import lombok.experimental.UtilityClass;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * 心跳管理器
+ * <p>
+ *     该类通常与类{@link SwitchBarrier}一起使用，心跳管理器管理业务的运行状态，而类{@link SwitchBarrier}管理对远端业务的访问
+ * </p>
+ * @author shizi
+ * @since 2020-11-24 15:16:35
+ */
+@Slf4j
+@UtilityClass
+public class HeartBeanManager {
+
+    /**
+     * 心跳守护线程池
+     */
+    private final ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), r -> {
+        Thread thread = new Thread(r, "heartbeat-daemon");
+        thread.setDaemon(true);
+        return thread;
+    });
+    /**
+     * 心跳异常时候的阈值打印
+     */
+    private static final Integer HEARD_BEAN_PRINT_THRESHOLD = 6;
+    /**
+     * 打印日志频率阈值
+     */
+    private Integer printLogThresholdNum = 0;
+    /**
+     * 业务的心跳任务
+     */
+    private static final Map<String, Pair<String, Boolean>> heartTaskMap = new ConcurrentHashMap<>();
+
+    static {
+        scheduler.scheduleWithFixedDelay(HeartBeanManager::heartBeat, 5, 5, TimeUnit.SECONDS);
+    }
+
+    private static void heartBeat() {
+        heartTaskMap.forEach((k, v) -> {
+            try {
+                HttpHelper.get(v.getKey());
+                serverRestore(k, v.getValue());
+                v.setValue(true);
+            } catch (Throwable e) {
+                serverUnAvailable(k);
+                v.setValue(false);
+            }
+        });
+    }
+
+    /**
+     * 添加业务的心跳判断
+     *
+     * @param bizName         业务名
+     * @param remoteHealthUrl 业务的心跳检测url
+     */
+    public void addWatch(String bizName, String remoteHealthUrl) {
+        heartTaskMap.putIfAbsent(bizName, new Pair<>(remoteHealthUrl, true));
+    }
+
+    /**
+     * 业务是否可用
+     *
+     * @param bizName 业务名
+     * @return true：业务可用，false：业务不可用
+     */
+    public boolean isHealth(String bizName) {
+        return SwitchBarrier.canCross(bizName);
+    }
+
+    private void serverRestore(String bizName, Boolean serverAvailable) {
+        if (!serverAvailable) {
+            log.info("service[{}] restoration", bizName);
+        }
+        printLogThresholdNum = 0;
+        SwitchBarrier.allowCross(bizName);
+    }
+
+    private void serverUnAvailable(String bizName) {
+        if (printLogThresholdNum <= 0) {
+            log.error("heartbeat error： service [{}] is unavailable", bizName);
+            printLogThresholdNum = HEARD_BEAN_PRINT_THRESHOLD;
+        } else {
+            printLogThresholdNum--;
+        }
+        SwitchBarrier.forbidCross(bizName);
+    }
+}

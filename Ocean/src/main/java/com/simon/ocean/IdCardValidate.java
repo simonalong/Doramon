@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
+ * 非常严格的身份证号判断工具
+ *
  * @author shizi
  * @since 2021-07-14 22:02:19
  */
