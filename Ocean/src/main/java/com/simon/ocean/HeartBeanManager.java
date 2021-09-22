@@ -24,14 +24,14 @@ public class HeartBeanManager {
      * 心跳守护线程池
      */
     private final ScheduledThreadPoolExecutor scheduler = new ScheduledThreadPoolExecutor(Runtime.getRuntime().availableProcessors(), r -> {
-        Thread thread = new Thread(r, "heartbeat-daemon");
+        Thread thread = new Thread(r, "heart-daemon");
         thread.setDaemon(true);
         return thread;
     });
     /**
      * 心跳异常时候的阈值打印
      */
-    private static final Integer HEARD_BEAN_PRINT_THRESHOLD = 6;
+    private final Integer HEARD_BEAN_PRINT_THRESHOLD = 6;
     /**
      * 打印日志频率阈值
      */
@@ -39,7 +39,7 @@ public class HeartBeanManager {
     /**
      * 业务的心跳任务
      */
-    private static final Map<String, Pair<String, Boolean>> heartTaskMap = new ConcurrentHashMap<>();
+    private final Map<String, Pair<String, Boolean>> heartTaskMap = new ConcurrentHashMap<>();
 
     static {
         scheduler.scheduleWithFixedDelay(HeartBeanManager::heartBeat, 5, 5, TimeUnit.SECONDS);
@@ -64,8 +64,27 @@ public class HeartBeanManager {
      * @param bizName         业务名
      * @param remoteHealthUrl 业务的心跳检测url
      */
-    public void addWatch(String bizName, String remoteHealthUrl) {
+    public void addHeartWatch(String bizName, String remoteHealthUrl) {
         heartTaskMap.putIfAbsent(bizName, new Pair<>(remoteHealthUrl, true));
+    }
+
+    /**
+     * 手动运行
+     * @param bizName 业务名
+     */
+    public void handleRun(String bizName) {
+        if (!heartTaskMap.containsKey(bizName)) {
+            return;
+        }
+        Pair<String, Boolean> healthPair = heartTaskMap.get(bizName);
+        try {
+            HttpHelper.get(healthPair.getKey());
+            serverRestore(bizName, healthPair.getValue());
+            healthPair.setValue(true);
+        } catch (Throwable e) {
+            serverUnAvailable(bizName);
+            healthPair.setValue(false);
+        }
     }
 
     /**
@@ -80,7 +99,7 @@ public class HeartBeanManager {
 
     private void serverRestore(String bizName, Boolean serverAvailable) {
         if (!serverAvailable) {
-            log.info("service[{}] restoration", bizName);
+            log.info("服务【{}】心跳恢复", bizName);
         }
         printLogThresholdNum = 0;
         SwitchBarrier.allowCross(bizName);
@@ -88,7 +107,7 @@ public class HeartBeanManager {
 
     private void serverUnAvailable(String bizName) {
         if (printLogThresholdNum <= 0) {
-            log.error("heartbeat error： service [{}] is unavailable", bizName);
+            log.error("服务【{}】心跳异常，url:{}", bizName, heartTaskMap.get(bizName).getKey());
             printLogThresholdNum = HEARD_BEAN_PRINT_THRESHOLD;
         } else {
             printLogThresholdNum--;
