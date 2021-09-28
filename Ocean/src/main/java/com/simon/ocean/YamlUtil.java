@@ -387,6 +387,40 @@ public class YamlUtil {
     }
 
     /**
+     * 将两个Yaml进行完全的合并
+     *
+     * @param aYaml
+     * @param bYaml
+     * @return 生成新的yaml
+     */
+    public String mergeFromYaml(String aYaml, String bYaml) {
+        Properties aProperties = yamlToPropertiesValue(aYaml);
+        Properties bProperties = yamlToPropertiesValue(bYaml);
+
+        aProperties.putAll(bProperties);
+
+        return propertiesToYaml(aProperties);
+    }
+
+    /**
+     * 将两个map进行完全的合并
+     *
+     * @param aMap
+     * @param bMap
+     * @return 生成新的map
+     */
+    public Map<String, Object> mergeFromMap(Map<String, Object> aMap, Map<String, Object> bMap) {
+        if (null == aMap || null == bMap) {
+            if (null == aMap) {
+                return bMap;
+            }
+            return aMap;
+        }
+
+        return yamlToMap(mergeFromYaml(mapToYaml(aMap), mapToYaml(bMap)));
+    }
+
+    /**
      * properties 转换到 yaml
      *
      * @param properties properties内容
