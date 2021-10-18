@@ -963,7 +963,8 @@ public class YamlUtil {
      * - k1: 12
      * - k2: 22
      * }
-     * 这种做一层缩进，由于snake的map转yaml后有缩进问题
+     * 1. 这种做一层缩进，由于snake的map转yaml后有缩进问题
+     * 2. 这里对yaml中的特殊字符，比如?做特殊处理
      */
     private String yamlFormatForMap(String content) {
         if (isEmpty(content)) {
@@ -979,7 +980,14 @@ public class YamlUtil {
             Integer blankSize = null;
             // 判断是否在数组中
             boolean inArray = false;
-            for (String item : items) {
+            for (String itemUnit : items) {
+                String item = itemUnit;
+                if (itemUnit.trim().endsWith("?")) {
+                    int index = itemUnit.indexOf(SIGN_SEMICOLON);
+                    if (index > -1) {
+                        item = itemUnit.substring(0, index) + ": '" + itemUnit.substring(index+1).trim() + "'";
+                    }
+                }
                 int innerBlankSize = item.substring(0, item.indexOf(item.trim())).length();
                 // 数组
                 if (item.trim().startsWith("- ")) {
