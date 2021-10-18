@@ -433,7 +433,18 @@ public class YamlUtil {
         }
         return cacheCompute("propertiesToYaml", properties, () -> {
             StringBuilder stringBuilder = new StringBuilder();
-            properties.forEach((k, v) -> stringBuilder.append(k).append("=").append(v).append(NEW_LINE));
+
+            properties.forEach((k, v) -> {
+                if(v instanceof String) {
+                    if (((String) v).startsWith("'") && ((String) v).endsWith("'")) {
+                        stringBuilder.append(k).append("=").append(v).append(NEW_LINE);
+                    } else {
+                        stringBuilder.append(k).append("=").append("'").append(v).append("'").append(NEW_LINE);
+                    }
+                } else {
+                    stringBuilder.append(k).append("=").append(v).append(NEW_LINE);
+                }
+            });
             return propertiesToYaml(stringBuilder.toString());
         });
     }
@@ -717,6 +728,15 @@ public class YamlUtil {
         if (isEmpty(content)) {
             return null;
         }
+
+        if ("[]".equals(content)) {
+            return new ArrayList();
+        }
+
+        if ("{}".equals(content)) {
+            return new HashMap<>();
+        }
+
         return cacheCompute("jsonToObject", content, () -> {
             if (!content.startsWith("{") && !content.startsWith("[")) {
                 return null;
@@ -743,7 +763,7 @@ public class YamlUtil {
      * @throws ValueChangeException 转换异常
      */
     public String jsonToYaml(String content) {
-        if (isEmpty(content)) {
+        if (isEmpty(content) || "[]".equals(content)) {
             return null;
         }
         return cacheCompute("jsonToYaml", content, () -> {
@@ -855,7 +875,7 @@ public class YamlUtil {
         if (isEmpty(key)) {
             return null;
         }
-        return cacheCompute("kvToProperties", key, value, () -> {
+        return cacheCompute("kvToProperties", key, value, desc, () -> {
             try {
                 // 将value对应的值先转换为properties类型，然后对key进行拼接，最后再统一转化为yaml格式
                 StringBuilder propertiesResult = new StringBuilder();
@@ -870,19 +890,19 @@ public class YamlUtil {
                         if (!isEmpty(propertiesContent)) {
                             propertiesResult.append(propertiesContent);
                         }
-                        return propertiesResult.toString();
+                        return (null == propertiesContent) ? null : propertiesResult.toString();
                     case JSON:
                         propertiesContent = yamlToProperties(key, jsonToYaml(value));
                         if (!isEmpty(propertiesContent)) {
                             propertiesResult.append(propertiesContent);
                         }
-                        return propertiesResult.toString();
+                        return (null == propertiesContent) ? null : propertiesResult.toString();
                     case PROPERTIES:
                         propertiesContent = propertiesAppendPrefixKey(key, value);
                         if (!isEmpty(propertiesContent)) {
                             propertiesResult.append(propertiesContent);
                         }
-                        return propertiesResult.toString();
+                        return (null == propertiesContent) ? null : propertiesResult.toString();
                     case STRING:
                         propertiesResult.append(key).append("=").append(appendSpaceForArrayValue(value));
                         return propertiesResult.toString();
@@ -1244,66 +1264,6 @@ public class YamlUtil {
     }
 
     @SuppressWarnings("rawtypes")
-    private void formatYamlToPropertiesValue(Properties properties, Map<String, String> remarkMap, Object object, String prefix) {
-        if (null == object) {
-            return;
-        }
-        if (object instanceof Map) {
-            Map map = (Map) object;
-            Set<?> set = map.keySet();
-            for (Object key : set) {
-                Object value = map.get(key);
-                if (null == value) {
-                    value = "";
-                }
-                if (value instanceof Map) {
-                    formatYamlToPropertiesValue(properties, remarkMap, value, prefixWithDOT(prefix) + key);
-                } else if (value instanceof Collection) {
-                    Collection collection = (Collection) value;
-                    if (!collection.isEmpty()) {
-                        Iterator<?> iterator = collection.iterator();
-                        int index = 0;
-                        while (iterator.hasNext()) {
-                            Object valueObject = iterator.next();
-                            formatYamlToPropertiesValue(properties, remarkMap, valueObject, prefixWithDOT(prefix) + key + "[" + index + "]");
-                            index = index + 1;
-                        }
-                    }
-                } else if (value instanceof String) {
-                    String valueStr = (String) value;
-                    valueStr = valueStr.trim();
-                    valueStr = valueStr.replace("\n", "\\\n");
-                    properties.put(prefixWithDOT(prefix) + key, valueStr);
-                } else {
-                    properties.put(prefixWithDOT(prefix) + key, value);
-                }
-            }
-        } else if (object instanceof Collection) {
-            Collection collection = (Collection) object;
-            if (!collection.isEmpty()) {
-                Iterator<?> iterator = collection.iterator();
-                int index = 0;
-                while (iterator.hasNext()) {
-                    Object valueObject = iterator.next();
-                    formatYamlToPropertiesValue(properties, remarkMap, valueObject, prefix + "[" + index + "]");
-                    index = index + 1;
-                }
-            }
-        } else if (object.getClass().isArray()) {
-            Object[] array = (Object[]) object;
-            for (int index = 0; index < array.length; index++) {
-                formatYamlToPropertiesValue(properties, remarkMap, array[index], prefix + "[" + index + "]");
-            }
-        } else if (object instanceof String) {
-            String valueObject = (String) object;
-            valueObject = valueObject.replace("\n", "\\\n");
-            properties.put(prefix, valueObject);
-        } else {
-            properties.put(prefix, object);
-        }
-    }
-
-    @SuppressWarnings("rawtypes")
     private void formatYamlToProperties(List<String> propertiesLineList, Map<String, String> remarkMap, Object object, String prefix) {
         if (null == object) {
             return;
@@ -1398,6 +1358,66 @@ public class YamlUtil {
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    private void formatYamlToPropertiesValue(Properties properties, Map<String, String> remarkMap, Object object, String prefix) {
+        if (null == object) {
+            return;
+        }
+        if (object instanceof Map) {
+            Map map = (Map) object;
+            Set<?> set = map.keySet();
+            for (Object key : set) {
+                Object value = map.get(key);
+                if (null == value) {
+                    value = "";
+                }
+                if (value instanceof Map) {
+                    formatYamlToPropertiesValue(properties, remarkMap, value, prefixWithDOT(prefix) + key);
+                } else if (value instanceof Collection) {
+                    Collection collection = (Collection) value;
+                    if (!collection.isEmpty()) {
+                        Iterator<?> iterator = collection.iterator();
+                        int index = 0;
+                        while (iterator.hasNext()) {
+                            Object valueObject = iterator.next();
+                            formatYamlToPropertiesValue(properties, remarkMap, valueObject, prefixWithDOT(prefix) + key + "[" + index + "]");
+                            index = index + 1;
+                        }
+                    }
+                } else if (value instanceof String) {
+                    String valueStr = (String) value;
+                    valueStr = valueStr.trim();
+                    valueStr = valueStr.replace("\n", "\\\n");
+                    properties.put(prefixWithDOT(prefix) + key, valueStr);
+                } else {
+                    properties.put(prefixWithDOT(prefix) + key, value);
+                }
+            }
+        } else if (object instanceof Collection) {
+            Collection collection = (Collection) object;
+            if (!collection.isEmpty()) {
+                Iterator<?> iterator = collection.iterator();
+                int index = 0;
+                while (iterator.hasNext()) {
+                    Object valueObject = iterator.next();
+                    formatYamlToPropertiesValue(properties, remarkMap, valueObject, prefix + "[" + index + "]");
+                    index = index + 1;
+                }
+            }
+        } else if (object.getClass().isArray()) {
+            Object[] array = (Object[]) object;
+            for (int index = 0; index < array.length; index++) {
+                formatYamlToPropertiesValue(properties, remarkMap, array[index], prefix + "[" + index + "]");
+            }
+        } else if (object instanceof String) {
+            String valueObject = (String) object;
+            valueObject = valueObject.replace("\n", "\\\n");
+            properties.put(prefix, valueObject);
+        } else {
+            properties.put(prefix, object);
+        }
+    }
+
     private String prefixWithDOT(String prefix) {
         if ("".equals(prefix)) {
             return prefix;
@@ -1463,6 +1483,18 @@ public class YamlUtil {
     @SuppressWarnings("unchecked")
     private <T> T cacheCompute(String funName, Object key, Object value, Supplier<T> biFunction) {
         String cacheKey = buildCacheKey(funName, key, value);
+        if (typeContentMap.containsKey(cacheKey)) {
+            return (T) typeContentMap.get(cacheKey);
+        }
+        T result = biFunction.get();
+        if (null != result) {
+            typeContentMap.put(cacheKey, result);
+        }
+        return result;
+    }
+
+    private <T> T cacheCompute(String funName, Object key, Object value, String desc, Supplier<T> biFunction) {
+        String cacheKey = buildCacheKey(funName, key, value, desc);
         if (typeContentMap.containsKey(cacheKey)) {
             return (T) typeContentMap.get(cacheKey);
         }
