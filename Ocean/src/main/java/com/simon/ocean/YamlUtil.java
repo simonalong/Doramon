@@ -334,22 +334,26 @@ public class YamlUtil {
         if (isEmpty(content)) {
             return null;
         }
+
         return cacheCompute("yamlToProperties", content, () -> {
+            String contentTem = content;
+
             try {
-                if (!content.contains(":") && !content.contains("-")) {
+                if (!contentTem.contains(":") && !contentTem.contains("-")) {
                     return null;
                 }
 
-                if (content.trim().startsWith("-")) {
+                if (contentTem.trim().startsWith("-")) {
                     throw new ValueChangeException("不支持数组的yaml转properties");
                 }
 
+                contentTem = yamlFormatForMap(content);
                 List<String> propertiesList = new ArrayList<>();
                 Map<String, String> remarkMap = new LinkedHashMap<>();
-                Map<String, Object> valueMap = yamlToMap(content);
+                Map<String, Object> valueMap = yamlToMap(contentTem);
 
                 // 读取yaml的注释
-                yamlToRemarkMap(remarkMap, Yaml.createYamlInput(content).readYamlMapping(), "");
+                yamlToRemarkMap(remarkMap, Yaml.createYamlInput(contentTem).readYamlMapping(), "");
                 formatYamlToProperties(propertiesList, remarkMap, valueMap, "");
                 return propertiesList.stream().filter(e -> null != e && !"".equals(e)).reduce((a, b) -> a + NEW_LINE + b).orElse("");
             } catch (Throwable e) {
