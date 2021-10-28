@@ -4,7 +4,7 @@ package com.simon.ocean.exception;
  * @author shizi
  * @since 2021-01-14 11:30:07
  */
-public class ValueParseException extends ConfigServerException{
+public class ValueParseException extends RuntimeException{
 
     public ValueParseException(Throwable e) {
         super(e);

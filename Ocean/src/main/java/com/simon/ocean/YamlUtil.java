@@ -347,7 +347,7 @@ public class YamlUtil {
                     throw new ValueChangeException("不支持数组的yaml转properties");
                 }
 
-                contentTem = yamlFormatForMap(content);
+                contentTem = yamlFormatForCron(content);
                 List<String> propertiesList = new ArrayList<>();
                 Map<String, String> remarkMap = new LinkedHashMap<>();
                 Map<String, Object> valueMap = yamlToMap(contentTem);
@@ -960,6 +960,39 @@ public class YamlUtil {
     }
 
     /**
+     * 针对cron表达式的yml进行转换
+     *
+     * 这里对yaml中的特殊字符，比如?做特殊处理
+     */
+    private String yamlFormatForCron(String content) {
+        if (isEmpty(content)) {
+            return null;
+        }
+        return cacheCompute("yamlFormatForCron", content, () -> {
+            if (!content.contains(":") && !content.contains("-")) {
+                return null;
+            }
+
+            StringBuilder stringBuilder = new StringBuilder();
+            String[] items = content.split("\n");
+            Integer blankSize = null;
+            // 判断是否在数组中
+            boolean inArray = false;
+            for (String itemUnit : items) {
+                String item = itemUnit;
+                if (itemUnit.trim().endsWith("?")) {
+                    int index = itemUnit.indexOf(SIGN_SEMICOLON);
+                    if (index > -1) {
+                        item = itemUnit.substring(0, index) + ": '" + itemUnit.substring(index+1).trim() + "'";
+                    }
+                }
+                stringBuilder.append(item).append("\n");
+            }
+            return stringBuilder.toString();
+        });
+    }
+
+    /**
      * 针对有些yaml格式不严格，这里做不严格向严格的eo-yaml解析的转换
      * <p>
      * 对{@code
@@ -967,8 +1000,7 @@ public class YamlUtil {
      * - k1: 12
      * - k2: 22
      * }
-     * 1. 这种做一层缩进，由于snake的map转yaml后有缩进问题
-     * 2. 这里对yaml中的特殊字符，比如?做特殊处理
+     * 这种做一层缩进，由于snake的map转yaml后有缩进问题
      */
     private String yamlFormatForMap(String content) {
         if (isEmpty(content)) {
