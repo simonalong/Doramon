@@ -82,6 +82,33 @@ public class YamlUtilPropertiesToYamlTest {
     }
 
     /**
+     * 基本测试：带注释
+     *
+     * # 总的
+     * # test
+     * a.b.c=1
+     * # 测试1
+     * a.b1.c.d.e=1
+     * # 用来说明xxx
+     * a.b2.c1.d1.e1=1
+     * a.b2.c1.d1.e2=2
+     * a.b2.c1.d1.e3=3
+     * # 数组
+     * a.b2.c1.d2[0]=3
+     * a.b2.c1.d2[1]=3
+     * a.b2.c1.d2[2]=3
+     */
+    @SneakyThrows
+    @Test
+    public void propertiesToYamlBase2Test() {
+        String propertiesContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/properties/base2.properties");
+        String yamlContent = FileUtil.readFromResource(YamlUtilPropertiesToYamlTest.class, "/yml/base2.yml");
+
+        //
+        Assert.assertEquals(yamlContent.trim(), YamlUtil.propertiesToYaml(propertiesContent).trim());
+    }
+
+    /**
      * 数组测试1
      *
      * a.b.c[0].d=1
